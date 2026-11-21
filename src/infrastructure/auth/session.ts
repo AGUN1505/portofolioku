@@ -14,9 +14,9 @@ export const SESSION_COOKIE_NAME = 'porto_admin_session';
 export const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 export function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET;
+  const secret = process.env.SESSION_SECRET || process.env.AUTH_SECRET;
   if (!secret || secret.length < 32) {
-    throw new Error('SESSION_SECRET environment variable is missing or shorter than 32 characters');
+    throw new Error('SESSION_SECRET (or AUTH_SECRET) environment variable is missing or shorter than 32 characters');
   }
   return secret;
 }
