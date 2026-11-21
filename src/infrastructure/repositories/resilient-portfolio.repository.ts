@@ -9,7 +9,9 @@ const RECOGNIZED_CONNECTIVITY_CODES = new Set([
   'ECONNRESET',
   'P1001',
   'P1002',
+  'P1011',
   'P1017',
+  'TlsConnectionError',
 ]);
 
 const FORBIDDEN_FALLBACK_CODES = new Set([

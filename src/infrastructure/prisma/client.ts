@@ -23,7 +23,15 @@ export function getPrismaClient(): PrismaClient {
     throw new Error('[PrismaClient] DATABASE_URL is not set in environment.');
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const isSsl =
+    connectionString.includes('sslmode=require') ||
+    connectionString.includes('supabase') ||
+    connectionString.includes('pooler.supabase.com');
+
+  const adapter = new PrismaPg({
+    connectionString,
+    ssl: isSsl ? { rejectUnauthorized: false } : undefined,
+  });
   const client = new PrismaClient({
     adapter,
     log: process.env.DEBUG_PRISMA === 'true' ? ['query', 'error', 'warn'] : ['error'],
