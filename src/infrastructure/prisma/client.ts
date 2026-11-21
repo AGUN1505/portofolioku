@@ -3,6 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 
+// Bypass TLS verification for cloud database poolers with self-signed certificate chains (Supabase pooler)
+if (typeof process !== 'undefined' && process.env) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   pgPool: pg.Pool | undefined;
@@ -25,36 +30,23 @@ export function getPrismaClient(): PrismaClient {
     throw new Error('[PrismaClient] DATABASE_URL is not set in environment.');
   }
 
-  let connectionString = rawConnectionString;
-  let isSsl = false;
+  // Ensure Node TLS does not reject Supabase pooler certificate chain
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-  try {
-    const url = new URL(rawConnectionString);
-    const sslmode = url.searchParams.get('sslmode');
-    const isSupabase =
-      url.hostname.includes('supabase.co') ||
-      url.hostname.includes('supabase.com') ||
-      url.hostname.includes('pooler.supabase.com');
+  // Replace any sslmode with 'no-verify' using regex to avoid URL parsing issues with special password characters
+  let connectionString = rawConnectionString
+    .replace(/sslmode=(require|prefer|verify-ca|verify-full)/gi, 'sslmode=no-verify')
+    .replace(/&?uselibpqcompat=(true|false)/gi, '');
 
-    if (sslmode || isSupabase) {
-      isSsl = true;
-      // Using 'no-verify' ensures pg-connection-string configures { rejectUnauthorized: false },
-      // preventing TLS self-signed cert chain verification rejection on Supabase pooler.
-      url.searchParams.set('sslmode', 'no-verify');
-      connectionString = url.toString();
-    }
-  } catch {
-    isSsl =
-      rawConnectionString.includes('sslmode=require') ||
-      rawConnectionString.includes('supabase') ||
-      rawConnectionString.includes('pooler.supabase.com');
+  if (!connectionString.includes('sslmode=')) {
+    connectionString += (connectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify';
   }
 
   const pool =
     globalForPrisma.pgPool ??
     new pg.Pool({
       connectionString,
-      ssl: isSsl ? { rejectUnauthorized: false } : undefined,
+      ssl: { rejectUnauthorized: false },
     });
 
   const adapter = new PrismaPg(pool);
@@ -79,4 +71,5 @@ export const prisma = new Proxy({} as PrismaClient, {
     return typeof value === 'function' ? value.bind(client) : value;
   },
 });
+
 
