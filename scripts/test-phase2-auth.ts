@@ -223,6 +223,28 @@ async function runTestSuite() {
   await multiLimiter.resetMultiDimension('alice', '192.168.1.100');
   const aliceResetStatus = await multiLimiter.checkMultiDimension('alice', '192.168.1.100');
   assert.strictEqual(aliceResetStatus.allowed, true, 'Alice should be allowed after reset');
+
+  // Test 3.5: Email rate-limiting keys and dimensions
+  const emailKeys = MemoryRateLimiter.buildEmailKeys('Admin@Domain.com', '127.0.0.1');
+  assert.strictEqual(emailKeys.emailKey, 'email:admin@domain.com');
+  assert.strictEqual(emailKeys.ipKey, 'ip:127.0.0.1');
+  assert.strictEqual(emailKeys.compositeKey, 'email_ip:admin@domain.com#127.0.0.1');
+
+  const dynEmailKeys = MemoryRateLimiter.buildKeys('Admin@Domain.com', '127.0.0.1');
+  assert.strictEqual(dynEmailKeys.emailKey, 'email:admin@domain.com');
+  assert.strictEqual(dynEmailKeys.compositeKey, 'email_ip:admin@domain.com#127.0.0.1');
+
+  const emailLimiter = new MemoryRateLimiter({ maxAttempts: 3, windowMs: 10000 });
+  await emailLimiter.recordMultiDimensionFailure('admin@domain.com', '192.168.1.50');
+  await emailLimiter.recordMultiDimensionFailure('admin@domain.com', '192.168.1.50');
+  await emailLimiter.recordMultiDimensionFailure('admin@domain.com', '192.168.1.50');
+  const emailCheck = await emailLimiter.checkMultiDimension('admin@domain.com', '192.168.1.50');
+  assert.strictEqual(emailCheck.allowed, false, 'Email should be blocked after 3 attempts');
+  assert.strictEqual(emailCheck.blockedDimension, 'email', 'Blocked dimension must be email');
+  await emailLimiter.resetMultiDimension('admin@domain.com', '192.168.1.50');
+  const emailResetCheck = await emailLimiter.checkMultiDimension('admin@domain.com', '192.168.1.50');
+  assert.strictEqual(emailResetCheck.allowed, true, 'Email should be allowed after reset');
+
   console.log('  ✓ Rate limiting sliding window, thresholds, and multi-dimension isolation passed');
 
   // =========================================================================
@@ -278,6 +300,14 @@ async function runTestSuite() {
   assert.strictEqual(foundAuth.passwordHash, '$2b$12$dummyhashsecretmustneverleak');
   const foundAuthAdminRecord = foundAuth.admin as unknown as Record<string, unknown>;
   assert.strictEqual(foundAuthAdminRecord.passwordHash, undefined, 'foundAuth.admin entity must not contain passwordHash');
+
+  const foundAuthEmail = await mockRepo.findAuthByEmail('admin@example.com');
+  assert.ok(foundAuthEmail !== null);
+  assert.strictEqual(foundAuthEmail.passwordHash, '$2b$12$dummyhashsecretmustneverleak');
+  assert.strictEqual(foundAuthEmail.admin.email, 'admin@example.com');
+  const foundAuthEmailAdminRecord = foundAuthEmail.admin as unknown as Record<string, unknown>;
+  assert.strictEqual(foundAuthEmailAdminRecord.passwordHash, undefined, 'foundAuthEmail.admin entity must not contain passwordHash');
+
   console.log('  ✓ PrismaAdminRepository queries, entity isolation, and leak prevention passed');
 
   // =========================================================================

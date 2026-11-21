@@ -1,17 +1,91 @@
 // Presentation mapper: combines domain data + presentation config → view models
-import type { Project, Experience, ContactProfile } from "../../domain/entities";
+import type { Project, Experience, ContactProfile, Certificate } from "../../domain/entities";
 import type {
   ProjectViewModel,
   ExperienceViewModel,
   ContactChannelViewModel,
+  HeroRoleViewModel,
+  EngineeringNodeViewModel,
+  CertificateViewModel,
 } from "../view-models";
 import {
   PROJECT_PRESENTATION_CONFIG,
   EXPERIENCE_PRESENTATION_CONFIG,
   CONTACT_PRESENTATION_CONFIG,
 } from "../data/presentation-config";
+import {
+  HERO_ROLES,
+  SCHEMATIC_NODES,
+  DEFAULT_CONTACT_CHANNELS,
+} from "../data/constants";
+
+function isAuthenticContactChannel(channel?: {
+  readonly label?: string;
+  readonly value?: string;
+}): boolean {
+  if (!channel || !channel.value || typeof channel.value !== "string") {
+    return false;
+  }
+  const val = channel.value.trim();
+  if (val.length === 0) {
+    return false;
+  }
+  const lower = val.toLowerCase();
+  return !(
+    lower.includes("placeholder") ||
+    val.includes("[") ||
+    val.includes("]") ||
+    lower.includes("ready for official")
+  );
+}
 
 export class PortfolioViewMapper {
+  static toHeroRoleViewModels(
+    roles?: ReadonlyArray<{ readonly title: string; readonly primary: boolean }>
+  ): ReadonlyArray<HeroRoleViewModel> {
+    if (!roles || roles.length === 0) {
+      return HERO_ROLES;
+    }
+    return roles.map((role, idx) => ({
+      index: String(idx + 1).padStart(2, "0"),
+      title: role.title,
+      primary: role.primary,
+    }));
+  }
+
+  static toEngineeringNodeViewModels(
+    nodes?: ReadonlyArray<{
+      readonly tag: string;
+      readonly title: string;
+      readonly description: string;
+      readonly stack?: string;
+      readonly highlighted: boolean;
+    }>
+  ): ReadonlyArray<EngineeringNodeViewModel> {
+    if (!nodes || nodes.length === 0) {
+      return SCHEMATIC_NODES;
+    }
+    return nodes.map((node) => ({
+      tag: node.tag,
+      title: node.title,
+      description: node.description,
+      stack: node.stack,
+      highlighted: node.highlighted,
+    }));
+  }
+
+  static toContactChannelViewModels(
+    channels?: ReadonlyArray<{ readonly label: string; readonly value: string }>
+  ): ReadonlyArray<ContactChannelViewModel> {
+    const rawChannels =
+      channels && channels.length > 0 ? channels : DEFAULT_CONTACT_CHANNELS;
+    const authenticChannels = rawChannels.filter(isAuthenticContactChannel);
+
+    return authenticChannels.map((channel, idx) =>
+      PortfolioViewMapper.toContactChannelViewModel(channel, idx)
+    );
+  }
+
   static toProjectViewModel(project: Project): ProjectViewModel {
     const config = PROJECT_PRESENTATION_CONFIG.find((c) => c.id === project.id);
 
@@ -22,6 +96,7 @@ export class PortfolioViewMapper {
       category: project.category,
       description: project.description,
       technologies: project.technologies,
+      thumbnailUrl: project.thumbnailUrl ?? null,
       // Presentation config
       desktopCategory: `// ${project.category.toUpperCase()}`,
       tabletTag: PortfolioViewMapper.buildProjectTabletTag(project),
@@ -74,6 +149,40 @@ export class PortfolioViewMapper {
       desktopWidth: config?.desktopWidth ?? "w-[580px]",
       tabletWidth: config?.tabletWidth ?? "w-[688px]",
       mobileHeight: config?.mobileHeight ?? "min-h-[68px]",
+    };
+  }
+
+  static toCertificateViewModel(certificate: Certificate): CertificateViewModel {
+    let formattedDate = '';
+    if (certificate.issueDate) {
+      const d = new Date(certificate.issueDate);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+        });
+      }
+    }
+
+    const isPdf =
+      typeof certificate.fileUrl === 'string' &&
+      certificate.fileUrl.toLowerCase().endsWith('.pdf');
+
+    return {
+      id: certificate.id,
+      title: certificate.title,
+      issuer: certificate.issuer,
+      issueDate: certificate.issueDate
+        ? certificate.issueDate instanceof Date
+          ? certificate.issueDate.toISOString()
+          : String(certificate.issueDate)
+        : null,
+      credentialId: certificate.credentialId ?? null,
+      credentialUrl: certificate.credentialUrl ?? null,
+      fileUrl: certificate.fileUrl,
+      order: certificate.order,
+      formattedDate: formattedDate || undefined,
+      isPdf,
     };
   }
 

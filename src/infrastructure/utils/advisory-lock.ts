@@ -12,6 +12,9 @@ export const AdvisoryLockNamespace = {
   PROJECT: 1006,
   EXPERIENCE: 1007,
   SKILL: 1008,
+  CONTACT_CHANNEL: 1009,
+  CERTIFICATE: 1010,
+  SECTION_CONFIG: 1011,
   CATEGORY_CHILDREN: 2001,
 } as const;
 

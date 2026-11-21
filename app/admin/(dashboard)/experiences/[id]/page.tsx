@@ -2,14 +2,18 @@
 // Sub-Route: Edit Experience Form
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../../src/infrastructure/composition-root';
 import { ExperienceForm } from '../ExperienceForm';
+
+export const instant = false;
 
 interface EditExperiencePageProps {
   readonly params: Promise<{ readonly id: string }>;
 }
 
 export default async function EditExperiencePage({ params }: EditExperiencePageProps) {
+  await connection();
   const { id } = await params;
   const getExperienceByIdUseCase = CompositionRoot.getGetExperienceByIdUseCase();
   const experience = await getExperienceByIdUseCase.execute(id);

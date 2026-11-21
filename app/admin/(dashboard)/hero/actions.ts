@@ -64,6 +64,7 @@ export async function updateHeroProfileAction(
 
     revalidatePath('/admin/hero');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,

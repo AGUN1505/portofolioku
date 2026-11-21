@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/skills/page.tsx
 // Module 7: Skills and Skill Categories Management (Clean Architecture Presentation Layer)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { SkillCategoryListClient, type SkillCategoryWithSkills } from './SkillCategoryListClient';
 
+export const instant = false;
+
 export default async function SkillsPage() {
+  await connection();
   const categoryRepo = CompositionRoot.getSkillCategoryRepository();
   const skillRepo = CompositionRoot.getSkillRepository();
 

@@ -85,6 +85,7 @@ export async function createExperienceAction(
 
     revalidatePath('/admin/experiences');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,
@@ -171,6 +172,7 @@ export async function updateExperienceAction(
     revalidatePath('/admin/experiences');
     revalidatePath(`/admin/experiences/${id}`);
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,
@@ -231,6 +233,7 @@ export async function deleteExperienceAction(id: string): Promise<ActionResult> 
 
     revalidatePath('/admin/experiences');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,
@@ -290,6 +293,7 @@ export async function reorderExperiencesAction(orderedIds: string[]): Promise<Ac
 
     revalidatePath('/admin/experiences');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,

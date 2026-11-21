@@ -2,14 +2,18 @@
 // Sub-Route: Edit Project Form
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../../src/infrastructure/composition-root';
 import { ProjectForm } from '../ProjectForm';
+
+export const instant = false;
 
 interface EditProjectPageProps {
   readonly params: Promise<{ readonly id: string }>;
 }
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
+  await connection();
   const { id } = await params;
   const getProjectByIdUseCase = CompositionRoot.getGetProjectByIdUseCase();
   const project = await getProjectByIdUseCase.execute(id);

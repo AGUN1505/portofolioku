@@ -2,9 +2,13 @@
 // Sub-Route: Create New Experience Form
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { ExperienceForm } from '../ExperienceForm';
 
-export default function NewExperiencePage() {
+export const instant = false;
+
+export default async function NewExperiencePage() {
+  await connection();
   return (
     <div className="space-y-6">
       {/* Module Header */}

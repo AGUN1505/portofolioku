@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/about/page.tsx
 // Module 3: About Profile Management (Singleton)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { AboutForm } from './AboutForm';
 
+export const instant = false;
+
 export default async function AboutProfilePage() {
+  await connection();
   const useCase = CompositionRoot.getGetAboutProfileUseCase();
   const profile = await useCase.execute();
 

@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/contact/page.tsx
 // Module 8: Contact Profile Management (Singleton)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { ContactForm } from './ContactForm';
 
+export const instant = false;
+
 export default async function ContactProfilePage() {
+  await connection();
   const useCase = CompositionRoot.getGetContactProfileUseCase();
   const profile = await useCase.execute();
 

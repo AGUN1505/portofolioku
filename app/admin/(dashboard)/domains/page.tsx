@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/domains/page.tsx
 // Module 5: Engineering Domains Management (Clean Architecture Presentation Layer)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { DomainListClient } from './DomainListClient';
 
+export const instant = false;
+
 export default async function DomainsPage() {
+  await connection();
   const getDomainsUseCase = CompositionRoot.getGetDomainsUseCase();
   const domains = await getDomainsUseCase.execute();
 

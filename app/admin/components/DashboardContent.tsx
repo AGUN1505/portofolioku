@@ -2,6 +2,7 @@
 // Server Component for CMS Dashboard Hub (Read-Only Portfolio Overview)
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { verifySession } from '../../../src/infrastructure/auth/dal';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import type { Portfolio } from '../../../src/domain/entities';
@@ -18,6 +19,7 @@ interface ModuleInventoryItem {
 }
 
 export async function DashboardContent() {
+  await connection();
   const session = await verifySession();
 
   let portfolio: Portfolio | null = null;
@@ -43,7 +45,7 @@ export async function DashboardContent() {
       count: portfolio ? 1 : '—',
       type: 'Singleton',
       phase: 'Phase 3',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Roles',
@@ -53,7 +55,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.hero.roles.length : '—',
       type: 'Collection',
       phase: 'Phase 5',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Engineering Nodes',
@@ -63,7 +65,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.hero.engineeringNodes.length : '—',
       type: 'Collection',
       phase: 'Phase 5',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'About Profile',
@@ -73,7 +75,7 @@ export async function DashboardContent() {
       count: portfolio ? 1 : '—',
       type: 'Singleton',
       phase: 'Phase 3',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Domains',
@@ -83,7 +85,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.about.domains.length : '—',
       type: 'Collection',
       phase: 'Phase 5',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Pillars',
@@ -93,7 +95,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.about.pillars.length : '—',
       type: 'Collection',
       phase: 'Phase 5',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Projects',
@@ -103,7 +105,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.projects.length : '—',
       type: 'Collection',
       phase: 'Phase 4',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Experiences',
@@ -113,7 +115,17 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.experiences.length : '—',
       type: 'Collection',
       phase: 'Phase 4',
-      status: 'Pending',
+      status: 'Active',
+    },
+    {
+      name: 'Certificates',
+      section: 'Work & History',
+      href: '/admin/certificates',
+      modelName: 'Certificate',
+      count: portfolio ? portfolio.certificates.length : '—',
+      type: 'Collection',
+      phase: 'Phase 7',
+      status: 'Active',
     },
     {
       name: 'Skills & Taxonomy',
@@ -123,7 +135,7 @@ export async function DashboardContent() {
       count: portfolio ? `${totalSkillsCount} (${portfolio.skills.categories.length} cats)` : '—',
       type: 'Collection',
       phase: 'Phase 5',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Contact Profile',
@@ -133,7 +145,7 @@ export async function DashboardContent() {
       count: portfolio ? 1 : '—',
       type: 'Singleton',
       phase: 'Phase 3',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Contact Channels',
@@ -143,7 +155,7 @@ export async function DashboardContent() {
       count: portfolio ? portfolio.contact.channels.length : '—',
       type: 'Collection',
       phase: 'Phase 6',
-      status: 'Pending',
+      status: 'Active',
     },
     {
       name: 'Account Settings',
@@ -153,7 +165,7 @@ export async function DashboardContent() {
       count: '1 Account',
       type: 'Singleton',
       phase: 'Phase 6',
-      status: 'Pending',
+      status: 'Active',
     },
   ];
 
@@ -162,7 +174,7 @@ export async function DashboardContent() {
       {/* Page Header */}
       <header className="pb-5 border-b border-[var(--border-subtle)]">
         <p className="text-xs uppercase font-mono tracking-widest text-[var(--accent-cobalt)]">
-          Stage 10.4 • Phase 2
+          Stage 10.4 • Complete
         </p>
         <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] mt-1">
           Dashboard Hub
@@ -176,10 +188,10 @@ export async function DashboardContent() {
       <section className="bg-white border border-[var(--border-subtle)] p-5 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
           <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-primary)] font-semibold">
-            System & Database Environment
+            System &amp; Database Environment
           </h2>
-          <span className="font-mono text-[10px] px-2 py-0.5 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
-            Read-Only Audit Mode
+          <span className="font-mono text-[10px] px-2 py-0.5 bg-[#EBF7EE] border border-[#A5D6A7] text-[#1B5E20]">
+            All 14 Modules Active
           </span>
         </div>
 
@@ -226,7 +238,7 @@ export async function DashboardContent() {
           Portfolio Content Inventory
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
           <div className="p-4 bg-white border border-[var(--border-subtle)]">
             <p className="text-[10px] font-mono uppercase text-[var(--text-secondary)]">Projects</p>
             <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">
@@ -274,12 +286,22 @@ export async function DashboardContent() {
             <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">
               {portfolio ? portfolio.contact.channels.length : '—'}
             </p>
-            <p className="text-[10px] font-mono text-[var(--text-secondary)] mt-1">0 Configured</p>
+            <p className="text-[10px] font-mono text-[var(--text-secondary)] mt-1">
+              {portfolio ? `${portfolio.contact.channels.length} Configured` : '—'}
+            </p>
+          </div>
+
+          <div className="p-4 bg-white border border-[var(--border-subtle)]">
+            <p className="text-[10px] font-mono uppercase text-[var(--text-secondary)]">Certificates</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">
+              {portfolio ? portfolio.certificates.length : '—'}
+            </p>
+            <p className="text-[10px] font-mono text-[var(--text-secondary)] mt-1">Credentials</p>
           </div>
         </div>
       </section>
 
-      {/* 13 Dedicated Modules Directory Matrix */}
+      {/* 14 Dedicated Modules Directory Matrix */}
       <section className="bg-white border border-[var(--border-subtle)] p-5 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
           <div>
@@ -287,11 +309,11 @@ export async function DashboardContent() {
               Modular Section Directory (1 Page = 1 Section)
             </h2>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              13 dedicated administrative views segregated by domain responsibility.
+              14 dedicated administrative views segregated by domain responsibility.
             </p>
           </div>
           <span className="font-mono text-[10px] px-2 py-0.5 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
-            13 Modules Wired
+            14 Modules Wired
           </span>
         </div>
 
@@ -305,6 +327,7 @@ export async function DashboardContent() {
                 <th className="py-2.5 px-3">Type</th>
                 <th className="py-2.5 px-3">Records</th>
                 <th className="py-2.5 px-3">Roadmap</th>
+                <th className="py-2.5 px-3">Status</th>
                 <th className="py-2.5 px-3 text-right">Action</th>
               </tr>
             </thead>
@@ -331,12 +354,23 @@ export async function DashboardContent() {
                       {item.phase}
                     </span>
                   </td>
+                  <td className="py-2.5 px-3">
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 border ${
+                        item.status === 'Active'
+                          ? 'bg-[#EBF7EE] border-[#A5D6A7] text-[#1B5E20]'
+                          : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
                   <td className="py-2.5 px-3 text-right">
                     <Link
                       href={item.href}
                       className="text-xs text-[var(--accent-cobalt)] hover:underline inline-flex items-center space-x-1"
                     >
-                      <span>View</span>
+                      <span>Manage</span>
                       <span>→</span>
                     </Link>
                   </td>
@@ -347,10 +381,10 @@ export async function DashboardContent() {
         </div>
       </section>
 
-      {/* Safety Notice Strip */}
+      {/* Operational Status Strip */}
       <footer className="p-4 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <p>
-          Stage 10.4 Phase 2 Guardrail: Database mutations and CRUD forms are disabled on all modules until their respective implementation phases.
+          CMS Operational Status: All 14 dedicated administrative modules are active, protected by DAL session verification, and synchronized with public cache revalidation.
         </p>
         <Link
           href="/"

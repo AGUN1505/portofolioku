@@ -327,6 +327,8 @@ async function runTests() {
       description: 'Desc',
       channels: [],
     },
+    certificates: [],
+    sections: [],
   };
 
   const dummyPrismaPortfolio: Portfolio = {

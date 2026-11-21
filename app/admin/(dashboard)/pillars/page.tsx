@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/pillars/page.tsx
 // Module 6: Engineering Pillars Management (Clean Architecture Presentation Layer)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { PillarListClient } from './PillarListClient';
 
+export const instant = false;
+
 export default async function PillarsPage() {
+  await connection();
   const getPillarsUseCase = CompositionRoot.getGetPillarsUseCase();
   const pillars = await getPillarsUseCase.execute();
 

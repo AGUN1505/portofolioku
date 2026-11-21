@@ -22,6 +22,7 @@ const NAVIGATION_SECTIONS: readonly NavSection[] = [
     sectionTitle: 'Core',
     items: [
       { label: 'Dashboard', href: '/admin' },
+      { label: 'Section Order', href: '/admin/sections' },
     ],
   },
   {
@@ -45,6 +46,7 @@ const NAVIGATION_SECTIONS: readonly NavSection[] = [
     items: [
       { label: 'Projects', href: '/admin/projects' },
       { label: 'Experiences', href: '/admin/experiences' },
+      { label: 'Certificates', href: '/admin/certificates' },
     ],
   },
   {

@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/engineering-nodes/page.tsx
 // Module 4: Engineering Nodes Management (Clean Architecture Presentation Layer)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { EngineeringNodeListClient } from './EngineeringNodeListClient';
 
+export const instant = false;
+
 export default async function EngineeringNodesPage() {
+  await connection();
   const getEngineeringNodesUseCase = CompositionRoot.getGetEngineeringNodesUseCase();
   const nodes = await getEngineeringNodesUseCase.execute();
 

@@ -7,6 +7,8 @@ import { AdminShell } from '../components/AdminShell';
 import { AdminUserSection } from '../components/AdminUserSection';
 import AdminLoading from './loading';
 
+export const instant = false;
+
 export default function AdminDashboardLayout({
   children,
 }: {

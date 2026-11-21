@@ -98,6 +98,34 @@ import { UpdateSkillUseCase } from '../application/use-cases/skills/update-skill
 import { DeleteSkillUseCase } from '../application/use-cases/skills/delete-skill.use-case';
 import { ReorderSkillsUseCase } from '../application/use-cases/skills/reorder-skills.use-case';
 
+// Phase 6: Contact Channels & Admin Account Settings
+import type { IContactChannelRepository } from '../domain/repositories/contact-channel.repository';
+import { PrismaContactChannelRepository } from './repositories/prisma-contact-channel.repository';
+import { GetContactChannelsUseCase } from '../application/use-cases/contact-channels/get-contact-channels.use-case';
+import { GetContactChannelByIdUseCase } from '../application/use-cases/contact-channels/get-contact-channel-by-id.use-case';
+import { CreateContactChannelUseCase } from '../application/use-cases/contact-channels/create-contact-channel.use-case';
+import { UpdateContactChannelUseCase } from '../application/use-cases/contact-channels/update-contact-channel.use-case';
+import { DeleteContactChannelUseCase } from '../application/use-cases/contact-channels/delete-contact-channel.use-case';
+import { ReorderContactChannelsUseCase } from '../application/use-cases/contact-channels/reorder-contact-channels.use-case';
+import { GetAdminAccountUseCase } from '../application/use-cases/account/get-admin-account.use-case';
+import { UpdateAdminProfileUseCase } from '../application/use-cases/account/update-admin-profile.use-case';
+import { ChangeAdminPasswordUseCase } from '../application/use-cases/account/change-admin-password.use-case';
+
+// Certificates Feature
+import type { ICertificateRepository } from '../domain/repositories/certificate.repository';
+import { PrismaCertificateRepository } from './repositories/prisma-certificate.repository';
+import { GetCertificatesUseCase } from '../application/use-cases/certificates/get-certificates.use-case';
+import { CreateCertificateUseCase } from '../application/use-cases/certificates/create-certificate.use-case';
+import { UpdateCertificateUseCase } from '../application/use-cases/certificates/update-certificate.use-case';
+import { DeleteCertificateUseCase } from '../application/use-cases/certificates/delete-certificate.use-case';
+import { ReorderCertificatesUseCase } from '../application/use-cases/certificates/reorder-certificates.use-case';
+
+// Section Config Feature
+import type { ISectionConfigRepository } from '../domain/repositories/section-config.repository';
+import { PrismaSectionConfigRepository } from './repositories/prisma-section-config.repository';
+import { GetSectionConfigsUseCase } from '../application/use-cases/sections/get-sections.use-case';
+import { ReorderSectionConfigsUseCase } from '../application/use-cases/sections/reorder-sections.use-case';
+
 import { prisma } from './prisma/client';
 
 export type RepositorySource = 'static' | 'prisma' | 'resilient';
@@ -122,6 +150,15 @@ export class CompositionRoot {
   private static pillarRepoInstance: IPillarRepository | null = null;
   private static skillCategoryRepoInstance: ISkillCategoryRepository | null = null;
   private static skillRepoInstance: ISkillRepository | null = null;
+
+  // Phase 6 Repositories
+  private static contactChannelRepoInstance: IContactChannelRepository | null = null;
+
+  // Certificates Feature Repository
+  private static certificateRepoInstance: ICertificateRepository | null = null;
+
+  // Section Config Feature Repository
+  private static sectionConfigRepoInstance: ISectionConfigRepository | null = null;
 
   static getResilientPortfolioRepository(): ResilientPortfolioRepository {
     if (!CompositionRoot.resilientRepoInstance) {
@@ -566,12 +603,124 @@ export class CompositionRoot {
     );
   }
 
+  // ============================================================
+  // PHASE 6: CONTACT CHANNELS
+  // ============================================================
+
+  static getContactChannelRepository(): IContactChannelRepository {
+    if (!CompositionRoot.contactChannelRepoInstance) {
+      CompositionRoot.contactChannelRepoInstance = new PrismaContactChannelRepository(prisma);
+    }
+    return CompositionRoot.contactChannelRepoInstance;
+  }
+
+  static getGetContactChannelsUseCase(): GetContactChannelsUseCase {
+    return new GetContactChannelsUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  static getGetContactChannelByIdUseCase(): GetContactChannelByIdUseCase {
+    return new GetContactChannelByIdUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  static getCreateContactChannelUseCase(): CreateContactChannelUseCase {
+    return new CreateContactChannelUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  static getUpdateContactChannelUseCase(): UpdateContactChannelUseCase {
+    return new UpdateContactChannelUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  static getDeleteContactChannelUseCase(): DeleteContactChannelUseCase {
+    return new DeleteContactChannelUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  static getReorderContactChannelsUseCase(): ReorderContactChannelsUseCase {
+    return new ReorderContactChannelsUseCase(CompositionRoot.getContactChannelRepository());
+  }
+
+  // ============================================================
+  // PHASE 6: ADMIN ACCOUNT SETTINGS
+  // ============================================================
+
+  static getGetAdminAccountUseCase(): GetAdminAccountUseCase {
+    return new GetAdminAccountUseCase(CompositionRoot.getAdminRepository());
+  }
+
+  static getUpdateAdminProfileUseCase(): UpdateAdminProfileUseCase {
+    return new UpdateAdminProfileUseCase(
+      CompositionRoot.getAdminRepository(),
+      CompositionRoot.getPasswordService()
+    );
+  }
+
+  static getChangeAdminPasswordUseCase(): ChangeAdminPasswordUseCase {
+    return new ChangeAdminPasswordUseCase(
+      CompositionRoot.getAdminRepository(),
+      CompositionRoot.getPasswordService()
+    );
+  }
+
+  // ============================================================
+  // CERTIFICATES FEATURE
+  // ============================================================
+
+  static getCertificateRepository(): ICertificateRepository {
+    if (!CompositionRoot.certificateRepoInstance) {
+      CompositionRoot.certificateRepoInstance = new PrismaCertificateRepository(prisma);
+    }
+    return CompositionRoot.certificateRepoInstance;
+  }
+
+  static getGetCertificatesUseCase(): GetCertificatesUseCase {
+    return new GetCertificatesUseCase(CompositionRoot.getCertificateRepository());
+  }
+
+  static getCertificatesUseCase(): GetCertificatesUseCase {
+    return CompositionRoot.getGetCertificatesUseCase();
+  }
+
+  static getCreateCertificateUseCase(): CreateCertificateUseCase {
+    return new CreateCertificateUseCase(CompositionRoot.getCertificateRepository());
+  }
+
+  static getUpdateCertificateUseCase(): UpdateCertificateUseCase {
+    return new UpdateCertificateUseCase(CompositionRoot.getCertificateRepository());
+  }
+
+  static getDeleteCertificateUseCase(): DeleteCertificateUseCase {
+    return new DeleteCertificateUseCase(CompositionRoot.getCertificateRepository());
+  }
+
+  static getReorderCertificatesUseCase(): ReorderCertificatesUseCase {
+    return new ReorderCertificatesUseCase(CompositionRoot.getCertificateRepository());
+  }
+
+  static getSectionConfigRepository(): ISectionConfigRepository {
+    if (!CompositionRoot.sectionConfigRepoInstance) {
+      CompositionRoot.sectionConfigRepoInstance = new PrismaSectionConfigRepository(prisma);
+    }
+    return CompositionRoot.sectionConfigRepoInstance;
+  }
+
+  static getGetSectionConfigsUseCase(): GetSectionConfigsUseCase {
+    return new GetSectionConfigsUseCase(CompositionRoot.getSectionConfigRepository());
+  }
+
+  static getSectionConfigsUseCase(): GetSectionConfigsUseCase {
+    return CompositionRoot.getGetSectionConfigsUseCase();
+  }
+
+  static getReorderSectionConfigsUseCase(): ReorderSectionConfigsUseCase {
+    return new ReorderSectionConfigsUseCase(CompositionRoot.getSectionConfigRepository());
+  }
+
   /**
    * Reset all singletons (for isolated testing).
    */
   static resetForTesting(): void {
     CompositionRoot.staticRepoInstance = null;
     CompositionRoot.prismaRepoInstance = null;
+    CompositionRoot.resilientRepoInstance = null;
     CompositionRoot.adminRepoInstance = null;
     CompositionRoot.passwordServiceInstance = null;
     CompositionRoot.rateLimiterInstance = null;
@@ -588,5 +737,14 @@ export class CompositionRoot {
     CompositionRoot.pillarRepoInstance = null;
     CompositionRoot.skillCategoryRepoInstance = null;
     CompositionRoot.skillRepoInstance = null;
+
+    // Phase 6 singletons
+    CompositionRoot.contactChannelRepoInstance = null;
+
+    // Certificates singleton
+    CompositionRoot.certificateRepoInstance = null;
+
+    // Section Config singleton
+    CompositionRoot.sectionConfigRepoInstance = null;
   }
 }

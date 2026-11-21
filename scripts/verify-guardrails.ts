@@ -1,3 +1,12 @@
+/**
+ * @deprecated Legacy Stage 10.2.2 staging verification script (FINDING-5.5.6-02).
+ *
+ * WARNING — PRODUCTION DATABASE ACCESS:
+ * This script explicitly loads `.env.local` and connects to the live PostgreSQL
+ * database (`porto_cms`). It asserts `admins === 0` and `contact_channels === 0`
+ * from the initial Stage 10.2.2 seed baseline and MUST NEVER be executed during
+ * isolated E2E test runs or without explicit written user authorization.
+ */
 // scripts/verify-guardrails.ts
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });

@@ -1,5 +1,6 @@
 // src/infrastructure/auth/memory-rate-limiter.ts
 // In-memory sliding-window rate limiter for local single-instance development.
+// Supports multi-dimensional rate limiting across username, email, IP, and composite keys.
 // NOTE: Not suitable for multi-instance or serverless production where shared storage (e.g. Redis) is required.
 
 import type { IRateLimiter, RateLimitCheckResult } from '../../domain/repositories/rate-limiter.interface';
@@ -25,22 +26,56 @@ export class MemoryRateLimiter implements IRateLimiter {
   }
 
   /**
-   * Builds distinct normalized keys for each dimension.
+   * Builds distinct normalized keys specifically for email dimensions.
    */
-  public static buildKeys(username: string, ip?: string): {
-    usernameKey: string;
+  public static buildEmailKeys(email: string, ip?: string): {
+    emailKey: string;
     ipKey?: string;
     compositeKey?: string;
   } {
-    const normalizedUser = username.toLowerCase().trim();
-    const result: { usernameKey: string; ipKey?: string; compositeKey?: string } = {
-      usernameKey: `usr:${normalizedUser}`,
+    const normalizedEmail = email.toLowerCase().trim();
+    const result: { emailKey: string; ipKey?: string; compositeKey?: string } = {
+      emailKey: `email:${normalizedEmail}`,
     };
 
     if (ip && ip.trim()) {
       const normalizedIp = ip.trim();
       result.ipKey = `ip:${normalizedIp}`;
-      result.compositeKey = `usr_ip:${normalizedUser}#${normalizedIp}`;
+      result.compositeKey = `email_ip:${normalizedEmail}#${normalizedIp}`;
+    }
+
+    return result;
+  }
+
+  /**
+   * Builds distinct normalized keys for each dimension.
+   * Dynamically formats keys for email (e.g. `email:...`, `email_ip:...`) or username (`usr:...`, `usr_ip:...`).
+   */
+  public static buildKeys(identifier: string, ip?: string): {
+    usernameKey: string;
+    emailKey?: string;
+    ipKey?: string;
+    compositeKey?: string;
+  } {
+    const normalized = identifier.toLowerCase().trim();
+    const isEmail = normalized.includes('@');
+    const primaryKey = isEmail ? `email:${normalized}` : `usr:${normalized}`;
+
+    const result: {
+      usernameKey: string;
+      emailKey?: string;
+      ipKey?: string;
+      compositeKey?: string;
+    } = {
+      usernameKey: primaryKey,
+      ...(isEmail ? { emailKey: primaryKey } : {}),
+    };
+
+    if (ip && ip.trim()) {
+      const normalizedIp = ip.trim();
+      result.ipKey = `ip:${normalizedIp}`;
+      const prefix = isEmail ? 'email_ip' : 'usr_ip';
+      result.compositeKey = `${prefix}:${normalized}#${normalizedIp}`;
     }
 
     return result;
@@ -126,19 +161,25 @@ export class MemoryRateLimiter implements IRateLimiter {
   }
 
   /**
-   * Helper to check all applicable dimensions (username, ip, composite).
+   * Helper to check all applicable dimensions (email/username, ip, composite).
    * If ANY dimension is blocked, access is denied.
    */
   public async checkMultiDimension(
-    username: string,
+    identifier: string,
     ip?: string
-  ): Promise<{ allowed: boolean; blockedDimension?: 'username' | 'ip' | 'composite'; retryAfterMs: number }> {
-    const keys = MemoryRateLimiter.buildKeys(username, ip);
+  ): Promise<{
+    allowed: boolean;
+    blockedDimension?: 'email' | 'username' | 'ip' | 'composite';
+    retryAfterMs: number;
+  }> {
+    const keys = MemoryRateLimiter.buildKeys(identifier, ip);
+    const isEmail = identifier.includes('@');
+    const primaryDimension: 'email' | 'username' = isEmail ? 'email' : 'username';
 
-    // 1. Check username dimension
-    const userResult = await this.check(keys.usernameKey);
-    if (!userResult.allowed) {
-      return { allowed: false, blockedDimension: 'username', retryAfterMs: userResult.retryAfterMs };
+    // 1. Check identity dimension (email or username)
+    const primaryResult = await this.check(keys.emailKey ?? keys.usernameKey);
+    if (!primaryResult.allowed) {
+      return { allowed: false, blockedDimension: primaryDimension, retryAfterMs: primaryResult.retryAfterMs };
     }
 
     // 2. Check IP dimension (if IP present)
@@ -163,9 +204,9 @@ export class MemoryRateLimiter implements IRateLimiter {
   /**
    * Record failure across all dimensions for this attempt.
    */
-  public async recordMultiDimensionFailure(username: string, ip?: string): Promise<void> {
-    const keys = MemoryRateLimiter.buildKeys(username, ip);
-    await this.recordFailure(keys.usernameKey);
+  public async recordMultiDimensionFailure(identifier: string, ip?: string): Promise<void> {
+    const keys = MemoryRateLimiter.buildKeys(identifier, ip);
+    await this.recordFailure(keys.emailKey ?? keys.usernameKey);
     if (keys.ipKey) await this.recordFailure(keys.ipKey);
     if (keys.compositeKey) await this.recordFailure(keys.compositeKey);
   }
@@ -173,11 +214,40 @@ export class MemoryRateLimiter implements IRateLimiter {
   /**
    * Reset all dimensions upon successful login.
    */
-  public async resetMultiDimension(username: string, ip?: string): Promise<void> {
-    const keys = MemoryRateLimiter.buildKeys(username, ip);
-    await this.reset(keys.usernameKey);
+  public async resetMultiDimension(identifier: string, ip?: string): Promise<void> {
+    const keys = MemoryRateLimiter.buildKeys(identifier, ip);
+    await this.reset(keys.emailKey ?? keys.usernameKey);
     if (keys.ipKey) await this.reset(keys.ipKey);
     if (keys.compositeKey) await this.reset(keys.compositeKey);
+  }
+
+  /**
+   * Dedicated email dimension check.
+   */
+  public async checkMultiDimensionEmail(
+    email: string,
+    ip?: string
+  ): Promise<{ allowed: boolean; blockedDimension?: 'email' | 'ip' | 'composite'; retryAfterMs: number }> {
+    const res = await this.checkMultiDimension(email, ip);
+    return {
+      allowed: res.allowed,
+      blockedDimension: res.blockedDimension as 'email' | 'ip' | 'composite' | undefined,
+      retryAfterMs: res.retryAfterMs,
+    };
+  }
+
+  /**
+   * Dedicated email dimension failure recording.
+   */
+  public async recordMultiDimensionEmailFailure(email: string, ip?: string): Promise<void> {
+    return this.recordMultiDimensionFailure(email, ip);
+  }
+
+  /**
+   * Dedicated email dimension reset.
+   */
+  public async resetMultiDimensionEmail(email: string, ip?: string): Promise<void> {
+    return this.resetMultiDimension(email, ip);
   }
 
   /**

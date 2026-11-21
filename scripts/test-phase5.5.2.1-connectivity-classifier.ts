@@ -35,6 +35,8 @@ const dummyStaticPortfolio: Portfolio = {
     description: 'Desc',
     channels: [],
   },
+  certificates: [],
+  sections: [],
 };
 
 const dummyPrismaPortfolio: Portfolio = {

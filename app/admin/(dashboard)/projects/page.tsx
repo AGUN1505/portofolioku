@@ -2,10 +2,14 @@
 // Module 8: Projects Showcase Management (Clean Architecture Presentation Layer)
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { ProjectListClient } from './ProjectListClient';
 
+export const instant = false;
+
 export default async function ProjectsPage() {
+  await connection();
   const getProjectsUseCase = CompositionRoot.getGetProjectsUseCase();
   const projects = await getProjectsUseCase.execute();
 

@@ -9,6 +9,7 @@ export interface ProjectViewModel {
   readonly category: string;
   readonly description: string;
   readonly technologies: ReadonlyArray<string>;
+  readonly thumbnailUrl?: string | null;
   // Presentation config (not domain)
   readonly desktopCategory: string;
   readonly tabletTag: string;
@@ -74,4 +75,18 @@ export interface EngineeringNodeViewModel {
   readonly description: string;
   readonly stack?: string;
   readonly highlighted: boolean;
+}
+
+// Certificate view model with presentation formatting
+export interface CertificateViewModel {
+  readonly id: string;
+  readonly title: string;
+  readonly issuer: string;
+  readonly issueDate: string | null;
+  readonly credentialId: string | null;
+  readonly credentialUrl: string | null;
+  readonly fileUrl: string;
+  readonly order: number;
+  readonly formattedDate?: string;
+  readonly isPdf: boolean;
 }

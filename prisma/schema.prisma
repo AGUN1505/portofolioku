@@ -199,3 +199,39 @@ model ContactChannel {
 
   @@map("contact_channels")
 }
+
+// ============================================================
+// CERTIFICATES SECTION
+// ============================================================
+
+model Certificate {
+  id            String    @id @default(cuid())
+  title         String
+  issuer        String
+  issueDate     DateTime?
+  credentialId  String?
+  credentialUrl String?   @db.Text
+  fileUrl       String    @db.Text
+  order         Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("certificates")
+}
+
+// ============================================================
+// SECTION CONFIG
+// ============================================================
+
+model SectionConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  order     Int
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("section_configs")
+}
+

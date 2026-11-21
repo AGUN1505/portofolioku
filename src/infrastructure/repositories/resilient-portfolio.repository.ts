@@ -148,6 +148,7 @@ export function isDatabaseConnectivityError(error: unknown): boolean {
  * Queries primary (Prisma) repository first. If an explicitly recognized database connectivity
  * failure occurs, it falls back to the static repository. Any other error (configuration, mapping,
  * validation, programming defects) is re-thrown immediately.
+ * Guaranteed to return full Portfolio aggregate including certificates: ReadonlyArray<Certificate> and sections: ReadonlyArray<SectionConfig>.
  */
 export class ResilientPortfolioRepository implements IPortfolioRepository<Promise<Portfolio>> {
   constructor(

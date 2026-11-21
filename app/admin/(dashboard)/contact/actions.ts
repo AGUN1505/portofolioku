@@ -60,6 +60,7 @@ export async function updateContactProfileAction(
 
     revalidatePath('/admin/contact');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,

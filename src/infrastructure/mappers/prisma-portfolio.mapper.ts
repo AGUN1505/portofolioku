@@ -12,6 +12,8 @@ import type {
   Skill as PrismaSkill,
   ContactProfile as PrismaContact,
   ContactChannel as PrismaChannel,
+  Certificate as PrismaCertificate,
+  SectionConfig as PrismaSectionConfig,
 } from '@prisma/client';
 
 import type {
@@ -22,6 +24,8 @@ import type {
   Experience as DomainExperience,
   SkillTaxonomy as DomainSkills,
   ContactProfile as DomainContact,
+  Certificate as DomainCertificate,
+  SectionConfig as DomainSectionConfig,
 } from '../../domain/entities';
 
 export class PrismaPortfolioMapper {
@@ -194,6 +198,33 @@ export class PrismaPortfolioMapper {
     };
   }
 
+  static toCertificate(c: PrismaCertificate): DomainCertificate {
+    return {
+      id: c.id,
+      title: c.title,
+      issuer: c.issuer,
+      issueDate: c.issueDate,
+      credentialId: c.credentialId,
+      credentialUrl: c.credentialUrl,
+      fileUrl: c.fileUrl,
+      order: c.order,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+    };
+  }
+
+  static toSectionConfig(s: PrismaSectionConfig): DomainSectionConfig {
+    return {
+      id: s.id,
+      key: s.key,
+      label: s.label,
+      order: s.order,
+      enabled: s.enabled,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+    };
+  }
+
   static toPortfolioAggregate(data: {
     hero: PrismaHero | null;
     roles: PrismaRole[];
@@ -206,6 +237,8 @@ export class PrismaPortfolioMapper {
     skillCategories: (PrismaCategory & { skills: PrismaSkill[] })[];
     contact: PrismaContact | null;
     channels: PrismaChannel[];
+    certificates: PrismaCertificate[];
+    sections?: PrismaSectionConfig[];
   }): Portfolio {
     return {
       hero: PrismaPortfolioMapper.toHeroProfile(data.hero, data.roles, data.nodes),
@@ -214,6 +247,14 @@ export class PrismaPortfolioMapper {
       experiences: data.experiences.map(PrismaPortfolioMapper.toExperience),
       skills: PrismaPortfolioMapper.toSkillTaxonomy(data.skillCategories),
       contact: PrismaPortfolioMapper.toContactProfile(data.contact, data.channels),
+      certificates: Array.isArray(data.certificates)
+        ? data.certificates.map(PrismaPortfolioMapper.toCertificate)
+        : [],
+      sections: Array.isArray(data.sections)
+        ? [...data.sections]
+            .sort((a, b) => a.order - b.order)
+            .map(PrismaPortfolioMapper.toSectionConfig)
+        : [],
     };
   }
 }

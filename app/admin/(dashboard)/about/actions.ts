@@ -61,6 +61,7 @@ export async function updateAboutProfileAction(
 
     revalidatePath('/admin/about');
     revalidatePath('/admin');
+    revalidatePath('/');
 
     return {
       success: true,

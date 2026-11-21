@@ -8,7 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 
 export function getPrismaClient(): PrismaClient {
   if (globalForPrisma.prisma) {
-    return globalForPrisma.prisma;
+    if (
+      !('certificate' in globalForPrisma.prisma) ||
+      !('sectionConfig' in globalForPrisma.prisma)
+    ) {
+      globalForPrisma.prisma = undefined;
+    } else {
+      return globalForPrisma.prisma;
+    }
   }
 
   const connectionString = process.env.DATABASE_URL;
@@ -19,7 +26,7 @@ export function getPrismaClient(): PrismaClient {
   const adapter = new PrismaPg({ connectionString });
   const client = new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.DEBUG_PRISMA === 'true' ? ['query', 'error', 'warn'] : ['error'],
   });
 
   if (process.env.NODE_ENV !== 'production') {

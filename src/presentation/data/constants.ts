@@ -53,3 +53,8 @@ export const SCHEMATIC_NODES: ReadonlyArray<EngineeringNodeViewModel> = [
     highlighted: false,
   },
 ];
+
+export const DEFAULT_CONTACT_CHANNELS: ReadonlyArray<{
+  readonly label: string;
+  readonly value: string;
+}> = [];

@@ -19,6 +19,11 @@ export interface CreateAdminInput {
   readonly email?: string | null;
 }
 
+export interface UpdateAdminProfileData {
+  readonly username?: string;
+  readonly email?: string | null;
+}
+
 export interface IAdminRepository {
   /**
    * Look up admin by ID. Returns pure domain entity without credentials.
@@ -31,10 +36,26 @@ export interface IAdminRepository {
   findByUsername(normalizedUsername: string): Promise<Admin | null>;
 
   /**
+   * Look up admin by normalized email. Returns pure domain entity without credentials.
+   */
+  findByEmail(normalizedEmail: string): Promise<Admin | null>;
+
+  /**
    * Internal auth query: retrieves credentials strictly for authentication verification.
    * Handled with care at infrastructure/application boundary.
    */
   findAuthByUsername(normalizedUsername: string): Promise<AdminAuthRecord | null>;
+
+  /**
+   * Internal auth query by email: retrieves credentials strictly for authentication verification.
+   * Handled with care at infrastructure/application boundary.
+   */
+  findAuthByEmail(normalizedEmail: string): Promise<AdminAuthRecord | null>;
+
+  /**
+   * Internal auth query by ID: retrieves credentials strictly for password verification.
+   */
+  findAuthById(id: string): Promise<AdminAuthRecord | null>;
 
   /**
    * Retrieves current session version for fast DAL verification.
@@ -45,6 +66,17 @@ export interface IAdminRepository {
    * Increments session version to invalidate all active sessions.
    */
   incrementSessionVersion(id: string): Promise<number>;
+
+  /**
+   * Updates administrator profile fields (username, email).
+   */
+  updateProfile(id: string, data: UpdateAdminProfileData): Promise<Admin>;
+
+  /**
+   * Updates administrator passwordHash and atomically increments sessionVersion
+   * to invalidate all other active sessions.
+   */
+  updatePassword(id: string, passwordHash: string): Promise<{ admin: Admin; sessionVersion: number }>;
 
   /**
    * Returns count of admin accounts to enforce single-admin policy.

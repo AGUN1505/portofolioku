@@ -11,6 +11,8 @@ export type { SkillCategory } from "./skill-category";
 export type { Skill } from "./skill";
 export type { ContactProfile } from "./contact-profile";
 export type { ContactChannel } from "./contact-channel";
+export type { Certificate } from "./certificate";
+export type { SectionConfig } from "./section-config";
 export type { Portfolio } from "./portfolio";
 export type { Admin } from "./admin";
 export type { HeroProfileRecord } from "./hero-profile-record";
@@ -24,4 +26,6 @@ export type { DomainRecord } from "./domain-record";
 export type { PillarRecord } from "./pillar-record";
 export type { SkillCategoryRecord } from "./skill-category-record";
 export type { SkillRecord } from "./skill-record";
+export type { ContactChannelRecord } from "./contact-channel-record";
+export type { CertificateRecord } from "./certificate-record";
 

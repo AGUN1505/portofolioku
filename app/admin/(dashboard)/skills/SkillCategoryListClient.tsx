@@ -1,7 +1,7 @@
 // app/admin/(dashboard)/skills/SkillCategoryListClient.tsx
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   createSkillCategoryAction,
@@ -51,6 +51,34 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
   // Form errors & modal error
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [modalError, setModalError] = useState<string | null>(null);
+
+  const isAnyModalOpen =
+    isCreateCategoryOpen ||
+    editingCategory !== null ||
+    categoryToDelete !== null ||
+    createSkillTargetCategory !== null ||
+    editingSkill !== null ||
+    skillToDelete !== null;
+
+  useEffect(() => {
+    if (!isAnyModalOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isPending) {
+        setIsCreateCategoryOpen(false);
+        setEditingCategory(null);
+        setCategoryToDelete(null);
+        setCreateSkillTargetCategory(null);
+        setEditingSkill(null);
+        setSkillToDelete(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isAnyModalOpen, isPending]);
 
   // -------------------------------------------------------------------------
   // CATEGORY ACTIONS
@@ -507,10 +535,15 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Create Category Modal */}
       {isCreateCategoryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-category-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Add Skill Category</h2>
+              <h2 id="create-category-modal-title" className="text-base font-bold text-[var(--text-primary)]">Add Skill Category</h2>
               <button
                 type="button"
                 onClick={() => setIsCreateCategoryOpen(false)}
@@ -567,10 +600,15 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Edit Category Modal */}
       {editingCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-category-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Edit Skill Category</h2>
+              <h2 id="edit-category-modal-title" className="text-base font-bold text-[var(--text-primary)]">Edit Skill Category</h2>
               <button
                 type="button"
                 onClick={() => setEditingCategory(null)}
@@ -627,9 +665,14 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Delete Category Modal (CASCADE PROTECTION) */}
       {categoryToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-category-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-base font-bold text-[#B71C1C]">Confirm Delete Skill Category</h2>
+            <h2 id="delete-category-modal-title" className="text-base font-bold text-[#B71C1C]">Confirm Delete Skill Category</h2>
             <div className="space-y-2 text-xs text-[var(--text-secondary)] leading-relaxed">
               <p>
                 Are you sure you want to delete category <strong className="text-[var(--text-primary)]">&quot;{categoryToDelete.title}&quot;</strong> (ID: {categoryToDelete.id})?
@@ -671,10 +714,15 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Create Skill Modal */}
       {createSkillTargetCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-skill-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Add Skill</h2>
+              <h2 id="create-skill-modal-title" className="text-base font-bold text-[var(--text-primary)]">Add Skill</h2>
               <button
                 type="button"
                 onClick={() => setCreateSkillTargetCategory(null)}
@@ -752,10 +800,15 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Edit Skill Modal (Allows moving to another category) */}
       {editingSkill && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-skill-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Edit Skill</h2>
+              <h2 id="edit-skill-modal-title" className="text-base font-bold text-[var(--text-primary)]">Edit Skill</h2>
               <button
                 type="button"
                 onClick={() => setEditingSkill(null)}
@@ -833,9 +886,14 @@ export function SkillCategoryListClient({ initialCategories }: SkillCategoryList
 
       {/* Delete Skill Modal */}
       {skillToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-skill-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-base font-bold text-[#B71C1C]">Confirm Delete Skill</h2>
+            <h2 id="delete-skill-modal-title" className="text-base font-bold text-[#B71C1C]">Confirm Delete Skill</h2>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
               Are you sure you want to permanently delete skill <strong className="text-[var(--text-primary)]">&quot;{skillToDelete.name}&quot;</strong> (ID: {skillToDelete.id})?
               This action cannot be undone.

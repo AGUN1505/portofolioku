@@ -9,6 +9,7 @@
   --border-subtle: #dcdad4;
   --background: var(--bg-primary);
   --foreground: var(--text-primary);
+  --ease-swiss: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
@@ -26,10 +27,115 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  overflow-x: clip;
 }
+
+/* Swiss-Tech Animation Utilities */
+@keyframes pulseRadar {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(36, 73, 216, 0.6);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(36, 73, 216, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(36, 73, 216, 0);
+  }
+}
+
+@keyframes pulseLiveGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes shimmerLight {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.radar-pulse-cobalt {
+  animation: pulseRadar 2.2s infinite ease-in-out;
+}
+
+.radar-pulse-green {
+  animation: pulseLiveGreen 2s infinite ease-in-out;
+}
+
+/* Glassmorphism Sticky Navbar Transition */
+.glass-header-scrolled {
+  background-color: rgba(247, 246, 242, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: rgba(220, 218, 212, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Smooth Interactive Transitions */
+.transition-swiss {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 400ms;
+}
+
+.hover-card-swiss {
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 350ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 250ms ease;
+}
+
+.hover-card-swiss:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.07);
+}
+
+/* Scroll Reveal Base Classes */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-init {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+

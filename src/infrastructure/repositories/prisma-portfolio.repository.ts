@@ -21,6 +21,8 @@ export class PrismaPortfolioRepository implements IPortfolioRepository<Promise<P
         skillCategories,
         contact,
         channels,
+        certificates,
+        sections,
       ] = await Promise.all([
         this.prisma.heroProfile.findUnique({ where: { id: 'singleton' } }),
         this.prisma.role.findMany({ orderBy: { order: 'asc' } }),
@@ -39,6 +41,32 @@ export class PrismaPortfolioRepository implements IPortfolioRepository<Promise<P
         }),
         this.prisma.contactProfile.findUnique({ where: { id: 'singleton' } }),
         this.prisma.contactChannel.findMany({ orderBy: { order: 'asc' } }),
+        this.prisma.certificate
+          ? this.prisma.certificate.findMany({ orderBy: { order: 'asc' } }).catch((err: unknown) => {
+              if (
+                typeof err === 'object' &&
+                err !== null &&
+                'code' in err &&
+                (err as { code: string }).code === 'P2021'
+              ) {
+                return [];
+              }
+              throw err;
+            })
+          : Promise.resolve([]),
+        this.prisma.sectionConfig
+          ? this.prisma.sectionConfig.findMany({ orderBy: { order: 'asc' } }).catch((err: unknown) => {
+              if (
+                typeof err === 'object' &&
+                err !== null &&
+                'code' in err &&
+                (err as { code: string }).code === 'P2021'
+              ) {
+                return [];
+              }
+              throw err;
+            })
+          : Promise.resolve([]),
       ]);
 
       return PrismaPortfolioMapper.toPortfolioAggregate({
@@ -53,6 +81,8 @@ export class PrismaPortfolioRepository implements IPortfolioRepository<Promise<P
         skillCategories,
         contact,
         channels,
+        certificates,
+        sections,
       });
     } catch (error) {
       console.error('[PrismaPortfolioRepository] Failed to fetch portfolio data:', error);

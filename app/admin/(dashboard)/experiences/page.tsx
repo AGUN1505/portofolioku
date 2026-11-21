@@ -2,10 +2,14 @@
 // Module 9: Experiences Chronology Management (Clean Architecture Presentation Layer)
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { ExperienceListClient } from './ExperienceListClient';
 
+export const instant = false;
+
 export default async function ExperiencesPage() {
+  await connection();
   const getExperiencesUseCase = CompositionRoot.getGetExperiencesUseCase();
   const experiences = await getExperiencesUseCase.execute();
 

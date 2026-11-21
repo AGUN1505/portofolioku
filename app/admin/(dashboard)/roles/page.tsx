@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/roles/page.tsx
 // Module 3: Roles Management (Clean Architecture Presentation Layer)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { RoleListClient } from './RoleListClient';
 
+export const instant = false;
+
 export default async function RolesPage() {
+  await connection();
   const getRolesUseCase = CompositionRoot.getGetRolesUseCase();
   const roles = await getRolesUseCase.execute();
 

@@ -2,6 +2,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import Link from 'next/link';
 import { updateContactProfileAction, type ContactFormState } from './actions';
 import type { ContactProfileRecord } from '../../../../src/domain/entities/contact-profile-record';
 
@@ -115,8 +116,16 @@ export function ContactForm({ initialData }: ContactFormProps) {
       </div>
 
       {/* Notice about Contact Channels */}
-      <div className="p-3 bg-[var(--bg-warm)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-secondary)]">
-        Note: Contact Channels (social links, email addresses) belong to the separate ContactChannel entity (Phase 4) and are not modified here.
+      <div className="p-3 bg-[var(--bg-warm)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-secondary)] flex flex-wrap items-center justify-between gap-2">
+        <span>
+          Note: Contact Channels (social links, email addresses) are managed separately from the Contact Profile copy.
+        </span>
+        <Link
+          href="/admin/contact-channels"
+          className="text-[var(--accent-cobalt)] hover:underline font-semibold whitespace-nowrap"
+        >
+          Manage Contact Channels →
+        </Link>
       </div>
 
       {/* Submission Bar */}

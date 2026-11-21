@@ -1,7 +1,7 @@
 // app/admin/(dashboard)/roles/RoleListClient.tsx
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   createRoleAction,
@@ -30,6 +30,25 @@ export function RoleListClient({ initialRoles }: RoleListClientProps) {
   // Form states & errors
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [modalError, setModalError] = useState<string | null>(null);
+
+  const isAnyModalOpen = isCreateOpen || editingRole !== null || roleToDelete !== null;
+
+  useEffect(() => {
+    if (!isAnyModalOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isPending) {
+        setIsCreateOpen(false);
+        setEditingRole(null);
+        setRoleToDelete(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isAnyModalOpen, isPending]);
 
   // Reorder handler
   const handleReorder = (currentIndex: number, direction: 'up' | 'down') => {
@@ -304,10 +323,15 @@ export function RoleListClient({ initialRoles }: RoleListClientProps) {
 
       {/* Create Modal */}
       {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-role-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Add New Role</h2>
+              <h2 id="create-role-modal-title" className="text-base font-bold text-[var(--text-primary)]">Add New Role</h2>
               <button
                 type="button"
                 onClick={() => setIsCreateOpen(false)}
@@ -376,10 +400,15 @@ export function RoleListClient({ initialRoles }: RoleListClientProps) {
 
       {/* Edit Modal */}
       {editingRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-role-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Edit Role</h2>
+              <h2 id="edit-role-modal-title" className="text-base font-bold text-[var(--text-primary)]">Edit Role</h2>
               <button
                 type="button"
                 onClick={() => setEditingRole(null)}
@@ -449,9 +478,14 @@ export function RoleListClient({ initialRoles }: RoleListClientProps) {
 
       {/* Delete Confirmation Modal */}
       {roleToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-role-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
           <div className="bg-white border border-[var(--border-subtle)] w-full max-w-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-base font-bold text-[#B71C1C]">Confirm Delete Role</h2>
+            <h2 id="delete-role-modal-title" className="text-base font-bold text-[#B71C1C]">Confirm Delete Role</h2>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
               Are you sure you want to permanently delete role <strong className="text-[var(--text-primary)]">&quot;{roleToDelete.title}&quot;</strong> (ID: {roleToDelete.id})?
               This action cannot be undone.

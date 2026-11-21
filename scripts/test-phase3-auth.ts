@@ -9,7 +9,12 @@ import { LoginAdminUseCase } from '../src/application/use-cases/auth/login-admin
 import { LogoutAdminUseCase } from '../src/application/use-cases/auth/logout-admin.use-case';
 import { BootstrapAdminUseCase } from '../src/application/use-cases/auth/bootstrap-admin.use-case';
 import { validateSessionPayload, UnauthorizedException, SessionRevokedException, SessionExpiredException } from '../src/infrastructure/auth/dal';
-import type { IAdminRepository, AdminAuthRecord, CreateAdminInput } from '../src/domain/repositories/admin.repository';
+import type {
+  IAdminRepository,
+  AdminAuthRecord,
+  CreateAdminInput,
+  UpdateAdminProfileData,
+} from '../src/domain/repositories/admin.repository';
 import type { Admin } from '../src/domain/entities/admin';
 
 dotenv.config({ path: '.env.local' });
@@ -33,6 +38,16 @@ class MockAdminRepository implements IAdminRepository {
     return null;
   }
 
+  public async findByEmail(normalizedEmail: string): Promise<Admin | null> {
+    const norm = normalizedEmail.toLowerCase().trim();
+    for (const item of Array.from(this.records.values())) {
+      if (item.admin.email === norm) {
+        return { ...item.admin };
+      }
+    }
+    return null;
+  }
+
   public async findAuthByUsername(normalizedUsername: string): Promise<AdminAuthRecord | null> {
     const norm = normalizedUsername.toLowerCase().trim();
     for (const item of Array.from(this.records.values())) {
@@ -47,6 +62,30 @@ class MockAdminRepository implements IAdminRepository {
     return null;
   }
 
+  public async findAuthByEmail(normalizedEmail: string): Promise<AdminAuthRecord | null> {
+    const norm = normalizedEmail.toLowerCase().trim();
+    for (const item of Array.from(this.records.values())) {
+      if (item.admin.email === norm) {
+        return {
+          admin: { ...item.admin },
+          passwordHash: item.passwordHash,
+          sessionVersion: item.sessionVersion,
+        };
+      }
+    }
+    return null;
+  }
+
+  public async findAuthById(id: string): Promise<AdminAuthRecord | null> {
+    const item = this.records.get(id);
+    if (!item) return null;
+    return {
+      admin: { ...item.admin },
+      passwordHash: item.passwordHash,
+      sessionVersion: item.sessionVersion,
+    };
+  }
+
   public async getSessionVersion(id: string): Promise<number | null> {
     const item = this.records.get(id);
     return item ? item.sessionVersion : null;
@@ -57,6 +96,36 @@ class MockAdminRepository implements IAdminRepository {
     if (!item) throw new Error('Admin not found');
     item.sessionVersion += 1;
     return item.sessionVersion;
+  }
+
+  public async updateProfile(id: string, data: UpdateAdminProfileData): Promise<Admin> {
+    const item = this.records.get(id);
+    if (!item) throw new Error('Admin not found');
+    item.admin = {
+      ...item.admin,
+      ...(data.username !== undefined ? { username: data.username.toLowerCase().trim() } : {}),
+      ...(data.email !== undefined ? { email: data.email ? data.email.toLowerCase().trim() : null } : {}),
+      updatedAt: new Date(),
+    };
+    return { ...item.admin };
+  }
+
+  public async updatePassword(
+    id: string,
+    passwordHash: string
+  ): Promise<{ admin: Admin; sessionVersion: number }> {
+    const item = this.records.get(id);
+    if (!item) throw new Error('Admin not found');
+    item.passwordHash = passwordHash;
+    item.sessionVersion += 1;
+    item.admin = {
+      ...item.admin,
+      updatedAt: new Date(),
+    };
+    return {
+      admin: { ...item.admin },
+      sessionVersion: item.sessionVersion,
+    };
   }
 
   public async count(): Promise<number> {
@@ -103,58 +172,70 @@ async function runPhase3Tests() {
     // Seed mock admin
     await repo.create({
       username: 'masteradmin',
+      email: 'masteradmin@example.com',
       passwordHash: hashedPassword,
     });
 
-    // 1.1: Username normalization
+    // 1.1: Email normalization
     const loginNormalized = await loginUseCase.execute({
-      username: '  MasterAdmin  ',
+      email: '  MasterAdmin@Example.COM  ',
       password: validPassword,
       clientIP: '127.0.0.1',
     });
     assert.strictEqual(loginNormalized.success, true, 'Login should succeed with unnormalized input');
-    assert.strictEqual(loginNormalized.admin?.username, 'masteradmin');
+    assert.strictEqual(loginNormalized.admin?.email, 'masteradmin@example.com');
     assert.strictEqual(loginNormalized.sessionVersion, 1);
-    console.log('  ✓ 1.1: Username normalization and case-insensitivity passed');
+    console.log('  ✓ 1.1: Email normalization and case-insensitivity passed');
 
-    // 1.2: Username not found -> Timing-safe dummy compare executed & generic error
+    // 1.2: Email format validation
+    const invalidFormatResult = await loginUseCase.execute({
+      email: 'not-an-email',
+      password: validPassword,
+      clientIP: '127.0.0.1',
+    });
+    assert.strictEqual(invalidFormatResult.success, false);
+    assert.strictEqual(invalidFormatResult.error, 'Invalid email format');
+    assert.strictEqual(invalidFormatResult.statusCode, 400);
+    console.log('  ✓ 1.2: Invalid email format strictly rejected with 400 Bad Request');
+
+    // 1.3: Email not found -> Timing-safe dummy compare executed & generic error
     const nonExistentResult = await loginUseCase.execute({
-      username: 'nonexistent',
+      email: 'nonexistent@example.com',
       password: 'AnyPassword123!',
       clientIP: '127.0.0.1',
     });
     assert.strictEqual(nonExistentResult.success, false);
-    assert.strictEqual(nonExistentResult.error, 'Invalid username or password');
+    assert.strictEqual(nonExistentResult.error, 'Invalid email or password');
     assert.strictEqual(nonExistentResult.statusCode, 401);
-    console.log('  ✓ 1.2: Username not found returned generic 401 with dummy comparison');
+    console.log('  ✓ 1.3: Email not found returned generic 401 with dummy comparison');
 
-    // 1.3: Wrong password for existing admin
+    // 1.4: Wrong password for existing admin
     const wrongPasswordResult = await loginUseCase.execute({
-      username: 'masteradmin',
+      email: 'masteradmin@example.com',
       password: 'WrongPassword123!',
       clientIP: '127.0.0.1',
     });
     assert.strictEqual(wrongPasswordResult.success, false);
-    assert.strictEqual(wrongPasswordResult.error, 'Invalid username or password');
+    assert.strictEqual(wrongPasswordResult.error, 'Invalid email or password');
     assert.strictEqual(wrongPasswordResult.statusCode, 401);
-    console.log('  ✓ 1.3: Wrong password returned identical generic 401 message');
+    console.log('  ✓ 1.4: Wrong password returned identical generic 401 message');
 
-    // 1.4: Error messages are strictly identical (preventing enumeration)
+    // 1.5: Error messages are strictly identical (preventing enumeration)
     assert.strictEqual(
       nonExistentResult.error,
       wrongPasswordResult.error,
       'Error messages must be identical for non-existent user and bad password'
     );
-    console.log('  ✓ 1.4: Zero information leakage between invalid user and bad password');
+    console.log('  ✓ 1.5: Zero information leakage between invalid user and bad password');
 
-    // 1.5: Multi-dimensional Rate Limiting
+    // 1.6: Multi-dimensional Rate Limiting with email keys
     const floodLimiter = new MemoryRateLimiter({ windowMs: 60000, maxAttempts: 5 });
     const floodLogin = new LoginAdminUseCase(repo, passwordService, floodLimiter);
 
     // Record 5 failed attempts
     for (let i = 1; i <= 5; i++) {
       const res = await floodLogin.execute({
-        username: 'masteradmin',
+        email: 'masteradmin@example.com',
         password: `bad_${i}`,
         clientIP: '192.168.1.100',
       });
@@ -164,7 +245,7 @@ async function runPhase3Tests() {
 
     // 6th attempt must be blocked with 429 BEFORE bcrypt check
     const sixthAttempt = await floodLogin.execute({
-      username: 'masteradmin',
+      email: 'masteradmin@example.com',
       password: validPassword, // Even with correct password, blocked by rate limit!
       clientIP: '192.168.1.100',
     });
@@ -172,7 +253,7 @@ async function runPhase3Tests() {
     assert.strictEqual(sixthAttempt.statusCode, 429);
     assert.ok(sixthAttempt.error?.includes('Too many failed login attempts'));
     assert.ok((sixthAttempt.retryAfterMs ?? 0) > 0);
-    console.log('  ✓ 1.5: 6th login failure strictly blocked with 429 rate limit before credential evaluation');
+    console.log('  ✓ 1.6: 6th login failure strictly blocked with 429 rate limit before credential evaluation');
   }
 
   // =========================================================================

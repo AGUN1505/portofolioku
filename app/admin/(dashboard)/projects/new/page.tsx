@@ -2,9 +2,13 @@
 // Sub-Route: Create New Project Form
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { ProjectForm } from '../ProjectForm';
 
-export default function NewProjectPage() {
+export const instant = false;
+
+export default async function NewProjectPage() {
+  await connection();
   return (
     <div className="space-y-6">
       {/* Module Header */}

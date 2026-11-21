@@ -2,10 +2,12 @@
 // Displays authenticated admin user session metadata and sign out trigger
 
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { verifySession } from '../../../src/infrastructure/auth/dal';
 import { logoutAction } from '../login/actions';
 
 export async function AdminUserSection() {
+  await connection();
   let session = null;
   try {
     session = await verifySession();

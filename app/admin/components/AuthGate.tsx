@@ -2,6 +2,7 @@
 // Authoritative Server-Side Authentication Gate for Admin Shell
 
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { verifySession, UnauthorizedException } from '../../../src/infrastructure/auth/dal';
 import type { ReactNode } from 'react';
 
@@ -15,6 +16,7 @@ interface AuthGateProps {
  * unless DAL verifySession() resolves with an authoritative valid session.
  */
 export async function AuthGate({ children }: AuthGateProps) {
+  await connection();
   try {
     await verifySession();
   } catch (error) {

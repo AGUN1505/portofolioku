@@ -49,16 +49,16 @@ export default function AdminLoginPage() {
         <form action={formAction} className="space-y-5" noValidate={false}>
           <div>
             <label
-              htmlFor="username"
+              htmlFor="email"
               className="block text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] mb-2"
             >
-              Username
+              Email Address
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
               aria-required="true"
               aria-invalid={Boolean(state?.error)}
               className="w-full bg-[#fcfbf9] border border-[var(--border-subtle)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-cobalt)] focus:ring-1 focus:ring-[var(--accent-cobalt)] transition-colors disabled:opacity-60 font-sans"
-              placeholder="e.g. admin"
+              placeholder="admin@example.com"
             />
           </div>
 

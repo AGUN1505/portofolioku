@@ -1,10 +1,14 @@
 // app/admin/(dashboard)/hero/page.tsx
 // Module 2: Hero Profile Management (Singleton)
 
+import { connection } from 'next/server';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { HeroForm } from './HeroForm';
 
+export const instant = false;
+
 export default async function HeroProfilePage() {
+  await connection();
   const useCase = CompositionRoot.getGetHeroProfileUseCase();
   const profile = await useCase.execute();
 

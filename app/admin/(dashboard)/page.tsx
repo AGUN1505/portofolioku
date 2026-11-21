@@ -5,6 +5,8 @@ import { Suspense } from 'react';
 import { DashboardContent } from '../components/DashboardContent';
 import AdminLoading from './loading';
 
+export const instant = false;
+
 export default function AdminDashboardPage() {
   return (
     <Suspense fallback={<AdminLoading />}>

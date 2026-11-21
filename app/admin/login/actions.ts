@@ -24,8 +24,8 @@ export async function loginAction(
   _prevState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
-  const username = formData.get('username') as string;
-  const password = formData.get('password') as string;
+  const email = (formData.get('email') as string) || (formData.get('username') as string) || '';
+  const password = (formData.get('password') as string) || '';
 
   // Extract client IP safely (respecting TRUSTED_PROXIES)
   const headerList = await headers();
@@ -33,7 +33,7 @@ export async function loginAction(
 
   const loginUseCase = CompositionRoot.getLoginAdminUseCase();
   const result = await loginUseCase.execute({
-    username,
+    email,
     password,
     clientIP,
   });
@@ -41,7 +41,7 @@ export async function loginAction(
   if (!result.success || !result.admin || result.sessionVersion === undefined) {
     return {
       success: false,
-      error: result.error ?? 'Invalid username or password',
+      error: result.error ?? 'Invalid email or password',
       statusCode: result.statusCode ?? 401,
       retryAfterMs: result.retryAfterMs,
     };
