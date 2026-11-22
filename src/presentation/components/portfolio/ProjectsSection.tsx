@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from "react";
 import Link from "next/link";
 import { SectionHeaderStrip } from "./SectionHeaderStrip";
 import { ScrollReveal } from "./ScrollReveal";
@@ -17,26 +14,10 @@ export function ProjectsSection({
   projects,
   sectionIndex = "03",
   sectionCounter = "SECTION 03 / 06",
-  initialLimit,
+  initialLimit = 3,
 }: ProjectsSectionProps) {
-  const [showAll, setShowAll] = useState(false);
-
-  // If initialLimit is explicitly passed, use it. Otherwise, default to 3 if more than 3 projects, or 2 if exactly 3 projects.
-  const limit = initialLimit ?? (projects.length > 3 ? 3 : 2);
-  const hasMoreProjects = projects.length > limit;
-  const visibleProjects = showAll ? projects : projects.slice(0, limit);
-
-  const handleToggle = () => {
-    if (showAll) {
-      setShowAll(false);
-      const section = document.getElementById("projects");
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    } else {
-      setShowAll(true);
-    }
-  };
+  // Show featured projects on the homepage (defaults to first 3 projects)
+  const visibleProjects = projects.slice(0, initialLimit);
 
   return (
     <section
@@ -137,22 +118,20 @@ export function ProjectsSection({
           ))}
         </div>
 
-        {hasMoreProjects && (
+        {/* Link to Dedicated All Projects Page */}
+        {projects.length > 0 && (
           <div className="mt-[64px] flex justify-center">
-            <button
-              type="button"
-              onClick={handleToggle}
+            <Link
+              href="/projects"
               className="group inline-flex items-center gap-[12px] border border-border-subtle bg-bg-surface px-[32px] py-[16px] font-mono text-[11px] leading-[14px] font-semibold tracking-[0.05em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
             >
               <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                {showAll ? "−" : "+"}
+                +
               </span>
               <span>
-                {showAll
-                  ? "[ SHOW LESS PROJECTS // COLLAPSE ]"
-                  : `[ MORE PROJECTS // VIEW ALL (${projects.length}) ]`}
+                [ MORE PROJECTS // VIEW ALL ({projects.length}) → ]
               </span>
-            </button>
+            </Link>
           </div>
         )}
       </div>
@@ -235,22 +214,20 @@ export function ProjectsSection({
           ))}
         </div>
 
-        {hasMoreProjects && (
+        {/* Link to Dedicated All Projects Page */}
+        {projects.length > 0 && (
           <div className="mt-[40px] flex justify-center">
-            <button
-              type="button"
-              onClick={handleToggle}
+            <Link
+              href="/projects"
               className="group inline-flex items-center gap-[10px] border border-border-subtle bg-bg-surface px-[24px] py-[14px] font-mono text-[10px] leading-[13px] font-semibold tracking-[0.04em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer"
             >
               <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                {showAll ? "−" : "+"}
+                +
               </span>
               <span>
-                {showAll
-                  ? "[ SHOW LESS // COLLAPSE ]"
-                  : `[ MORE PROJECTS // VIEW ALL (${projects.length}) ]`}
+                [ MORE PROJECTS // VIEW ALL ({projects.length}) → ]
               </span>
-            </button>
+            </Link>
           </div>
         )}
       </div>
@@ -333,22 +310,20 @@ export function ProjectsSection({
           ))}
         </div>
 
-        {hasMoreProjects && (
+        {/* Link to Dedicated All Projects Page */}
+        {projects.length > 0 && (
           <div className="mt-[32px] flex justify-center">
-            <button
-              type="button"
-              onClick={handleToggle}
+            <Link
+              href="/projects"
               className="w-full group inline-flex items-center justify-center gap-[8px] border border-border-subtle bg-bg-surface px-[18px] py-[12px] font-mono text-[9.5px] leading-[12px] font-semibold tracking-[0.03em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer"
             >
               <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                {showAll ? "−" : "+"}
+                +
               </span>
               <span>
-                {showAll
-                  ? "[ SHOW LESS // COLLAPSE ]"
-                  : `[ MORE PROJECTS (${projects.length}) ]`}
+                [ MORE PROJECTS // VIEW ALL ({projects.length}) → ]
               </span>
-            </button>
+            </Link>
           </div>
         )}
       </div>
