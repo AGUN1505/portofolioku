@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from "react";
 import { SectionHeaderStrip } from "./SectionHeaderStrip";
 import { ScrollReveal } from "./ScrollReveal";
 import type { ProjectViewModel } from "../../view-models";
@@ -6,13 +9,34 @@ interface ProjectsSectionProps {
   readonly projects: ReadonlyArray<ProjectViewModel>;
   readonly sectionIndex?: string;
   readonly sectionCounter?: string;
+  readonly initialLimit?: number;
 }
 
 export function ProjectsSection({
   projects,
   sectionIndex = "03",
   sectionCounter = "SECTION 03 / 06",
+  initialLimit,
 }: ProjectsSectionProps) {
+  const [showAll, setShowAll] = useState(false);
+
+  // If initialLimit is explicitly passed, use it. Otherwise, default to 3 if more than 3 projects, or 2 if exactly 3 projects.
+  const limit = initialLimit ?? (projects.length > 3 ? 3 : 2);
+  const hasMoreProjects = projects.length > limit;
+  const visibleProjects = showAll ? projects : projects.slice(0, limit);
+
+  const handleToggle = () => {
+    if (showAll) {
+      setShowAll(false);
+      const section = document.getElementById("projects");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      setShowAll(true);
+    }
+  };
+
   return (
     <section
       id="projects"
@@ -28,7 +52,7 @@ export function ProjectsSection({
       {/* DESKTOP PROJECTS (1280px+, centered max-w 1440px) */}
       <div className="hidden xl:block mx-auto w-full max-w-[1440px] xl:px-[48px] 2xl:px-[80px] pt-[56px] pb-[80px]">
         <div className="space-y-[64px]">
-          {projects.map((project, index) => (
+          {visibleProjects.map((project, index) => (
             <ScrollReveal
               key={project.id}
               delay={index * 120}
@@ -91,12 +115,31 @@ export function ProjectsSection({
             </ScrollReveal>
           ))}
         </div>
+
+        {hasMoreProjects && (
+          <div className="mt-[64px] flex justify-center">
+            <button
+              type="button"
+              onClick={handleToggle}
+              className="group inline-flex items-center gap-[12px] border border-border-subtle bg-bg-surface px-[32px] py-[16px] font-mono text-[11px] leading-[14px] font-semibold tracking-[0.05em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md"
+            >
+              <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                {showAll ? "−" : "+"}
+              </span>
+              <span>
+                {showAll
+                  ? "[ SHOW LESS PROJECTS // COLLAPSE ]"
+                  : `[ MORE PROJECTS // VIEW ALL (${projects.length}) ]`}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* TABLET PROJECTS (768px - 1279px) */}
       <div className="hidden md:block xl:hidden mx-auto w-full max-w-[1440px] px-[40px] pt-[40px] pb-[48px]">
         <div className="space-y-[48px]">
-          {projects.map((project) => (
+          {visibleProjects.map((project) => (
             <div key={project.id} className="border-b border-border-subtle pb-[48px] last:border-b-0 last:pb-0">
               <p className="font-mono text-[9px] leading-[11px] font-semibold tracking-[0.03em] text-text-secondary">
                 {project.tabletTag}
@@ -152,12 +195,31 @@ export function ProjectsSection({
             </div>
           ))}
         </div>
+
+        {hasMoreProjects && (
+          <div className="mt-[40px] flex justify-center">
+            <button
+              type="button"
+              onClick={handleToggle}
+              className="group inline-flex items-center gap-[10px] border border-border-subtle bg-bg-surface px-[24px] py-[14px] font-mono text-[10px] leading-[13px] font-semibold tracking-[0.04em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer"
+            >
+              <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                {showAll ? "−" : "+"}
+              </span>
+              <span>
+                {showAll
+                  ? "[ SHOW LESS // COLLAPSE ]"
+                  : `[ MORE PROJECTS // VIEW ALL (${projects.length}) ]`}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* MOBILE PROJECTS (< 768px) */}
       <div className="md:hidden px-[16px] sm:px-[24px] pt-[28px] pb-[40px]">
         <div className="space-y-[40px]">
-          {projects.map((project) => (
+          {visibleProjects.map((project) => (
             <div key={project.id} className="border-b border-border-subtle pb-[40px] last:border-b-0 last:pb-0">
               <p className="font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.03em] text-text-secondary">
                 {project.mobileTag}
@@ -213,6 +275,25 @@ export function ProjectsSection({
             </div>
           ))}
         </div>
+
+        {hasMoreProjects && (
+          <div className="mt-[32px] flex justify-center">
+            <button
+              type="button"
+              onClick={handleToggle}
+              className="w-full group inline-flex items-center justify-center gap-[8px] border border-border-subtle bg-bg-surface px-[18px] py-[12px] font-mono text-[9.5px] leading-[12px] font-semibold tracking-[0.03em] text-text-primary hover:border-accent-cobalt hover:text-accent-cobalt hover:bg-white active:scale-98 transition-all duration-200 cursor-pointer"
+            >
+              <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                {showAll ? "−" : "+"}
+              </span>
+              <span>
+                {showAll
+                  ? "[ SHOW LESS // COLLAPSE ]"
+                  : `[ MORE PROJECTS (${projects.length}) ]`}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
