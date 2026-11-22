@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   title: "Agun Firmansyah — Personal Portfolio",
   description:
     "Software developer focused on backend engineering, building practical digital solutions, and sharing knowledge through programming education.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
