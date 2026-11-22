@@ -11,7 +11,7 @@ function createPng(width, height, r, g, b, a = 255) {
     const body = Buffer.concat([t, data]);
     const crc = zlib.crc32(body);
     const c = Buffer.alloc(4);
-    c.writeUInt32BE(crc, 0);
+    c.writeUInt32BE(crc >>> 0, 0);
     return Buffer.concat([len, body, c]);
   }
 
@@ -45,31 +45,61 @@ function createPng(width, height, r, g, b, a = 255) {
   return Buffer.concat([signature, ihdrChunk, idatChunk, iendChunk]);
 }
 
-function createIco(pngBuffer) {
+/**
+ * Creates standard 32-bit DIB (Device Independent Bitmap) ICO file.
+ * 100% compatible with Chrome, Edge, Safari, Firefox, and Windows Explorer.
+ */
+function createDibIco(width, height, r, g, b, a = 255) {
   const header = Buffer.alloc(6);
   header.writeUInt16LE(0, 0); // Reserved
   header.writeUInt16LE(1, 2); // 1 = ICO
   header.writeUInt16LE(1, 4); // 1 image
 
-  const entry = Buffer.alloc(16);
-  entry.writeUInt8(32, 0); // Width
-  entry.writeUInt8(32, 1); // Height
-  entry.writeUInt8(0, 2);  // Color count
-  entry.writeUInt8(0, 3);  // Reserved
-  entry.writeUInt16LE(1, 4);  // Color planes
-  entry.writeUInt16LE(32, 6); // Bits per pixel
-  entry.writeUInt32LE(pngBuffer.length, 8); // Image size
-  entry.writeUInt32LE(22, 12); // Offset (6 + 16 = 22)
+  const dibHeaderSize = 40;
+  const xorSize = width * height * 4; // 32 bpp BGRA
+  const andRowSize = Math.ceil(width / 32) * 4; // row size padded to 4-byte boundary
+  const andSize = andRowSize * height;
+  const imageSize = dibHeaderSize + xorSize + andSize;
 
-  return Buffer.concat([header, entry, pngBuffer]);
+  const entry = Buffer.alloc(16);
+  entry.writeUInt8(width === 256 ? 0 : width, 0);
+  entry.writeUInt8(height === 256 ? 0 : height, 1);
+  entry.writeUInt8(0, 2); // color count
+  entry.writeUInt8(0, 3); // reserved
+  entry.writeUInt16LE(1, 4); // color planes
+  entry.writeUInt16LE(32, 6); // bits per pixel
+  entry.writeUInt32LE(imageSize, 8); // image size
+  entry.writeUInt32LE(22, 12); // offset (6 + 16 = 22)
+
+  const bih = Buffer.alloc(40);
+  bih.writeUInt32LE(40, 0); // biSize
+  bih.writeInt32LE(width, 4); // biWidth
+  bih.writeInt32LE(height * 2, 8); // biHeight (must be 2 * height for ICO)
+  bih.writeUInt16LE(1, 12); // biPlanes
+  bih.writeUInt16LE(32, 14); // biBitCount
+  bih.writeUInt32LE(0, 16); // biCompression = BI_RGB
+  bih.writeUInt32LE(xorSize + andSize, 20); // biSizeImage
+
+  const xorMap = Buffer.alloc(xorSize);
+  for (let i = 0; i < width * height; i++) {
+    const offset = i * 4;
+    xorMap[offset] = b;     // Blue
+    xorMap[offset + 1] = g; // Green
+    xorMap[offset + 2] = r; // Red
+    xorMap[offset + 3] = a; // Alpha
+  }
+
+  const andMask = Buffer.alloc(andSize, 0);
+
+  return Buffer.concat([header, entry, bih, xorMap, andMask]);
 }
 
-// Color: #2449d8 -> r: 0x24 (36), g: 0x49 (73), b: 0xd8 (216)
+// Color: Cobalt blue #2449d8 -> r: 36, g: 73, b: 216
 const png = createPng(32, 32, 0x24, 0x49, 0xd8);
-const ico = createIco(png);
+const ico = createDibIco(32, 32, 0x24, 0x49, 0xd8);
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" fill="#2449d8"/>
+  <rect width="32" height="32" rx="4" fill="#2449d8"/>
 </svg>
 `;
 

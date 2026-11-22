@@ -31,30 +31,40 @@ export async function loginAction(
   const headerList = await headers();
   const clientIP = extractClientIPFromHeaders(headerList);
 
-  const loginUseCase = CompositionRoot.getLoginAdminUseCase();
-  const result = await loginUseCase.execute({
-    email,
-    password,
-    clientIP,
-  });
+  try {
+    const loginUseCase = CompositionRoot.getLoginAdminUseCase();
+    const result = await loginUseCase.execute({
+      email,
+      password,
+      clientIP,
+    });
 
-  if (!result.success || !result.admin || result.sessionVersion === undefined) {
+    if (!result.success || !result.admin || result.sessionVersion === undefined) {
+      return {
+        success: false,
+        error: result.error ?? 'Invalid email or password',
+        statusCode: result.statusCode ?? 401,
+        retryAfterMs: result.retryAfterMs,
+      };
+    }
+
+    // Create encrypted Iron Session cookie (regenerated on successful login)
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    await createSessionCookie({
+      userId: result.admin.id,
+      username: result.admin.username,
+      sessionVersion: result.sessionVersion,
+      expiresAt,
+    });
+  } catch (err) {
+    console.error('[loginAction] Login execution error:', err);
+    const msg = err instanceof Error ? err.message : 'Database error';
     return {
       success: false,
-      error: result.error ?? 'Invalid email or password',
-      statusCode: result.statusCode ?? 401,
-      retryAfterMs: result.retryAfterMs,
+      error: `Database connection failed (${msg}). Please verify DATABASE_URL in Vercel.`,
+      statusCode: 500,
     };
   }
-
-  // Create encrypted Iron Session cookie (regenerated on successful login)
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  await createSessionCookie({
-    userId: result.admin.id,
-    username: result.admin.username,
-    sessionVersion: result.sessionVersion,
-    expiresAt,
-  });
 
   // Redirect to admin landing area
   redirect('/admin');

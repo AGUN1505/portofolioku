@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { verifySession, UnauthorizedException } from '../../../../src/infrastructure/auth/dal';
 import { CompositionRoot } from '../../../../src/infrastructure/composition-root';
 import { ProjectUploadService } from '../../../../src/infrastructure/storage/upload.service';
+import { isSupabaseStorageUrl } from '../../../../src/infrastructure/storage/supabase-storage.service';
 
 export interface ProjectFormState {
   readonly success: boolean;
@@ -133,7 +134,10 @@ export async function createProjectAction(
     const result = await useCase.execute(rawInput);
 
     if (!result.success || !result.data) {
-      if (uploadedThumbnailUrl && uploadedThumbnailUrl.startsWith('/uploads/projects/')) {
+      if (
+        uploadedThumbnailUrl &&
+        (uploadedThumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(uploadedThumbnailUrl))
+      ) {
         await ProjectUploadService.deleteByUrl(uploadedThumbnailUrl);
       }
       return {
@@ -155,7 +159,10 @@ export async function createProjectAction(
       timestamp: Date.now(),
     };
   } catch (err) {
-    if (uploadedThumbnailUrl && uploadedThumbnailUrl.startsWith('/uploads/projects/')) {
+    if (
+      uploadedThumbnailUrl &&
+      (uploadedThumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(uploadedThumbnailUrl))
+    ) {
       await ProjectUploadService.deleteByUrl(uploadedThumbnailUrl);
     }
     return {
@@ -288,7 +295,10 @@ export async function updateProjectAction(
     const result = await useCase.execute(id, rawInput);
 
     if (!result.success) {
-      if (newUploadedThumbnailUrl && newUploadedThumbnailUrl.startsWith('/uploads/projects/')) {
+      if (
+        newUploadedThumbnailUrl &&
+        (newUploadedThumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(newUploadedThumbnailUrl))
+      ) {
         await ProjectUploadService.deleteByUrl(newUploadedThumbnailUrl);
       }
       return {
@@ -303,7 +313,7 @@ export async function updateProjectAction(
     if (
       shouldCleanupOldFile &&
       existing.thumbnailUrl &&
-      existing.thumbnailUrl.startsWith('/uploads/projects/') &&
+      (existing.thumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(existing.thumbnailUrl)) &&
       existing.thumbnailUrl !== finalThumbnailUrl
     ) {
       await ProjectUploadService.deleteByUrl(existing.thumbnailUrl);
@@ -321,7 +331,10 @@ export async function updateProjectAction(
       timestamp: Date.now(),
     };
   } catch (err) {
-    if (newUploadedThumbnailUrl && newUploadedThumbnailUrl.startsWith('/uploads/projects/')) {
+    if (
+      newUploadedThumbnailUrl &&
+      (newUploadedThumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(newUploadedThumbnailUrl))
+    ) {
       await ProjectUploadService.deleteByUrl(newUploadedThumbnailUrl);
     }
     return {
@@ -378,8 +391,11 @@ export async function deleteProjectAction(id: string): Promise<ActionResult> {
       };
     }
 
-    // Delete associated uploaded thumbnail file from disk if stored in /uploads/projects/
-    if (existing?.thumbnailUrl && existing.thumbnailUrl.startsWith('/uploads/projects/')) {
+    // Delete associated uploaded thumbnail file from disk/storage
+    if (
+      existing?.thumbnailUrl &&
+      (existing.thumbnailUrl.startsWith('/uploads/projects/') || isSupabaseStorageUrl(existing.thumbnailUrl))
+    ) {
       await ProjectUploadService.deleteByUrl(existing.thumbnailUrl);
     }
 

@@ -5,6 +5,12 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as crypto from 'node:crypto';
+import {
+  getSupabaseStorageClient,
+  uploadToSupabaseStorage,
+  deleteFromSupabaseStorage,
+  isSupabaseStorageUrl,
+} from './supabase-storage.service';
 
 export const ALLOWED_CERTIFICATE_MIME_TYPES = [
   'application/pdf',
@@ -263,6 +269,43 @@ export class CertificateUploadService {
       const uniqueId = crypto.randomUUID();
       const filename = `${uniqueId}${ext}`;
 
+      // 1. Supabase Storage: Use when configured or running in Vercel serverless environment
+      const supabase = getSupabaseStorageClient();
+      const isVercel = process.env.VERCEL === '1';
+
+      if (supabase || isVercel) {
+        if (!supabase) {
+          return {
+            success: false,
+            error:
+              'Supabase Storage credentials (SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing in Vercel environment variables.',
+          };
+        }
+
+        const storageRes = await uploadToSupabaseStorage(
+          'certificates',
+          filename,
+          buffer,
+          validation.detectedMime
+        );
+
+        if (!storageRes.success || !storageRes.publicUrl) {
+          return {
+            success: false,
+            error: storageRes.error || 'Failed to upload certificate to Supabase Storage',
+          };
+        }
+
+        return {
+          success: true,
+          fileUrl: storageRes.publicUrl,
+          filename,
+          size,
+          mimeType: validation.detectedMime,
+        };
+      }
+
+      // 2. Local filesystem fallback (offline testing & local environments)
       await fs.promises.mkdir(targetDirectory, { recursive: true });
       const fullPath = path.join(/*turbopackIgnore: true*/ targetDirectory, filename);
       await fs.promises.writeFile(fullPath, buffer);
@@ -292,6 +335,11 @@ export class CertificateUploadService {
     targetDirectory: string = CERTIFICATE_UPLOAD_DIR
   ): Promise<boolean> {
     try {
+      // 1. Supabase Storage cleanup
+      if (isSupabaseStorageUrl(fileUrl)) {
+        return await deleteFromSupabaseStorage(fileUrl);
+      }
+
       if (!fileUrl.startsWith(CERTIFICATE_URL_PREFIX)) {
         return false;
       }
@@ -427,6 +475,43 @@ export class ProjectUploadService {
       const uniqueId = crypto.randomUUID();
       const filename = `${uniqueId}${ext}`;
 
+      // 1. Supabase Storage: Use when configured or running in Vercel serverless environment
+      const supabase = getSupabaseStorageClient();
+      const isVercel = process.env.VERCEL === '1';
+
+      if (supabase || isVercel) {
+        if (!supabase) {
+          return {
+            success: false,
+            error:
+              'Supabase Storage credentials (SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing in Vercel environment variables.',
+          };
+        }
+
+        const storageRes = await uploadToSupabaseStorage(
+          'projects',
+          filename,
+          buffer,
+          validation.detectedMime
+        );
+
+        if (!storageRes.success || !storageRes.publicUrl) {
+          return {
+            success: false,
+            error: storageRes.error || 'Failed to upload project thumbnail to Supabase Storage',
+          };
+        }
+
+        return {
+          success: true,
+          fileUrl: storageRes.publicUrl,
+          filename,
+          size,
+          mimeType: validation.detectedMime,
+        };
+      }
+
+      // 2. Local filesystem fallback (offline testing & local environments)
       await fs.promises.mkdir(targetDirectory, { recursive: true });
       const fullPath = path.join(/*turbopackIgnore: true*/ targetDirectory, filename);
       await fs.promises.writeFile(fullPath, buffer);
@@ -458,6 +543,10 @@ export class ProjectUploadService {
     try {
       if (!fileUrl || typeof fileUrl !== 'string') {
         return false;
+      }
+      // 1. Supabase Storage cleanup
+      if (isSupabaseStorageUrl(fileUrl)) {
+        return await deleteFromSupabaseStorage(fileUrl);
       }
       if (!fileUrl.startsWith(PROJECT_URL_PREFIX)) {
         return false;
