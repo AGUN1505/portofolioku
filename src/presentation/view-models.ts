@@ -10,6 +10,8 @@ export interface ProjectViewModel {
   readonly description: string;
   readonly technologies: ReadonlyArray<string>;
   readonly thumbnailUrl?: string | null;
+  readonly projectUrl?: string | null;
+  readonly githubUrl?: string | null;
   // Presentation config (not domain)
   readonly desktopCategory: string;
   readonly tabletTag: string;

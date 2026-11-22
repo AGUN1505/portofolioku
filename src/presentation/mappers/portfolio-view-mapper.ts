@@ -97,6 +97,8 @@ export class PortfolioViewMapper {
       description: project.description,
       technologies: project.technologies,
       thumbnailUrl: project.thumbnailUrl ?? null,
+      projectUrl: project.projectUrl ?? null,
+      githubUrl: project.githubUrl ?? null,
       // Presentation config
       desktopCategory: `// ${project.category.toUpperCase()}`,
       tabletTag: PortfolioViewMapper.buildProjectTabletTag(project),

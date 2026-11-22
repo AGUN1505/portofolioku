@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import Link from "next/link";
 import { SectionHeaderStrip } from "./SectionHeaderStrip";
 import { ScrollReveal } from "./ScrollReveal";
 import type { ProjectViewModel } from "../../view-models";
@@ -64,7 +65,12 @@ export function ProjectsSection({
                     {project.desktopCategory}
                   </p>
                   <h3 className={`mt-[16px] font-sans ${project.desktopTitleSize} font-bold tracking-[-0.01em] text-text-primary group-hover/card:text-accent-cobalt transition-colors duration-200 break-words`}>
-                    {project.title}
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="hover:underline hover:text-accent-cobalt transition-colors duration-200"
+                    >
+                      {project.title}
+                    </Link>
                   </h3>
                   <p className="mt-[16px] font-sans text-[16px] leading-[26px] font-normal text-text-secondary">
                     {project.description}
@@ -83,9 +89,24 @@ export function ProjectsSection({
                       </span>
                     ))}
                   </div>
+
+                  <div className="mt-[24px]">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="inline-flex items-center gap-[8px] font-mono text-[11px] font-semibold tracking-[0.04em] text-accent-cobalt hover:underline group/link"
+                    >
+                      <span>[ VIEW CASE STUDY & DETAILS // 0{index + 1} ]</span>
+                      <span className="inline-block transition-transform duration-200 group-hover/link:translate-x-1">
+                        →
+                      </span>
+                    </Link>
+                  </div>
                 </div>
 
-                <div className="min-w-0 w-full border border-border-subtle group-hover/card:border-accent-cobalt group-hover/card:shadow-md transition-all duration-300 overflow-hidden">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="block min-w-0 w-full border border-border-subtle group-hover/card:border-accent-cobalt group-hover/card:shadow-md transition-all duration-300 overflow-hidden cursor-pointer"
+                >
                   <div className="flex min-h-[32px] items-center border-b border-border-subtle px-[12px] py-[6px] bg-bg-surface group-hover/card:bg-white transition-colors duration-300">
                     <span className="min-w-0 truncate font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-text-secondary group-hover/card:text-accent-cobalt transition-colors duration-200">
                       {project.previewHeaderLeft}
@@ -110,7 +131,7 @@ export function ProjectsSection({
                       </div>
                     )}
                   </div>
-                </div>
+                </Link>
               </div>
             </ScrollReveal>
           ))}
@@ -139,19 +160,27 @@ export function ProjectsSection({
       {/* TABLET PROJECTS (768px - 1279px) */}
       <div className="hidden md:block xl:hidden mx-auto w-full max-w-[1440px] px-[40px] pt-[40px] pb-[48px]">
         <div className="space-y-[48px]">
-          {visibleProjects.map((project) => (
+          {visibleProjects.map((project, index) => (
             <div key={project.id} className="border-b border-border-subtle pb-[48px] last:border-b-0 last:pb-0">
               <p className="font-mono text-[9px] leading-[11px] font-semibold tracking-[0.03em] text-text-secondary">
                 {project.tabletTag}
               </p>
               <h3 className={`mt-[14px] font-sans ${project.desktopTitleSize} font-bold tracking-[-0.01em] text-text-primary break-words`}>
-                {project.title}
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="hover:underline hover:text-accent-cobalt transition-colors"
+                >
+                  {project.title}
+                </Link>
               </h3>
               <p className="mt-[14px] font-sans text-[15px] leading-[24px] font-normal text-text-secondary">
                 {project.description}
               </p>
 
-              <div className="mt-[28px] border border-border-subtle">
+              <Link
+                href={`/projects/${project.id}`}
+                className="block mt-[28px] border border-border-subtle cursor-pointer hover:border-accent-cobalt transition-colors"
+              >
                 <div className="flex min-h-[28px] items-center border-b border-border-subtle px-[12px] py-[6px]">
                   <span className="min-w-0 truncate font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-text-secondary">
                     {project.previewHeaderLeft}
@@ -176,7 +205,7 @@ export function ProjectsSection({
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
 
               <div className="mt-[20px] flex flex-wrap gap-[8px]">
                 {project.tags.map((tag, idx) => (
@@ -191,6 +220,16 @@ export function ProjectsSection({
                     {tag.label}
                   </span>
                 ))}
+              </div>
+
+              <div className="mt-[20px]">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="inline-flex items-center gap-[6px] font-mono text-[10px] font-semibold tracking-[0.03em] text-accent-cobalt hover:underline"
+                >
+                  <span>[ VIEW CASE STUDY & DETAILS // 0{index + 1} ]</span>
+                  <span>→</span>
+                </Link>
               </div>
             </div>
           ))}
@@ -219,19 +258,27 @@ export function ProjectsSection({
       {/* MOBILE PROJECTS (< 768px) */}
       <div className="md:hidden px-[16px] sm:px-[24px] pt-[28px] pb-[40px]">
         <div className="space-y-[40px]">
-          {visibleProjects.map((project) => (
+          {visibleProjects.map((project, index) => (
             <div key={project.id} className="border-b border-border-subtle pb-[40px] last:border-b-0 last:pb-0">
               <p className="font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.03em] text-text-secondary">
                 {project.mobileTag}
               </p>
               <h3 className={`mt-[12px] font-sans ${project.mobileTitleSize} font-bold tracking-[-0.01em] text-text-primary break-words`}>
-                {project.title}
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="hover:underline hover:text-accent-cobalt transition-colors"
+                >
+                  {project.title}
+                </Link>
               </h3>
               <p className="mt-[12px] font-sans text-[14px] leading-[22px] font-normal text-text-secondary">
                 {project.mobileDescription}
               </p>
 
-              <div className="mt-[24px] border border-border-subtle">
+              <Link
+                href={`/projects/${project.id}`}
+                className="block mt-[24px] border border-border-subtle cursor-pointer hover:border-accent-cobalt transition-colors"
+              >
                 <div className="flex min-h-[24px] items-center border-b border-border-subtle px-[12px] py-[5px]">
                   <span className="min-w-0 truncate font-mono text-[8px] leading-[10px] font-semibold tracking-[0.02em] text-text-secondary">
                     PREVIEW // {project.id}
@@ -256,7 +303,7 @@ export function ProjectsSection({
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
 
               <div className="mt-[16px] flex flex-wrap gap-[6px]">
                 {project.tags.map((tag, idx) => (
@@ -271,6 +318,16 @@ export function ProjectsSection({
                     {tag.label}
                   </span>
                 ))}
+              </div>
+
+              <div className="mt-[16px]">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="inline-flex items-center gap-[6px] font-mono text-[9px] font-semibold tracking-[0.03em] text-accent-cobalt hover:underline"
+                >
+                  <span>[ VIEW CASE STUDY & DETAILS // 0{index + 1} ]</span>
+                  <span>→</span>
+                </Link>
               </div>
             </div>
           ))}
