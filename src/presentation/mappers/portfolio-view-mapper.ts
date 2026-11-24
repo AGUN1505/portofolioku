@@ -187,6 +187,42 @@ export class PortfolioViewMapper {
     };
   }
 
+  static buildContactHref(label: string, value: string): string {
+    if (!value || typeof value !== "string") return "#";
+    const trimmed = value.trim();
+    const lowerLabel = (label || "").toLowerCase();
+
+    // Explicit protocol already provided
+    if (
+      trimmed.startsWith("mailto:") ||
+      trimmed.startsWith("tel:") ||
+      trimmed.startsWith("sms:") ||
+      trimmed.startsWith("http://") ||
+      trimmed.startsWith("https://")
+    ) {
+      return trimmed;
+    }
+
+    // Email
+    if (lowerLabel.includes("email") || (trimmed.includes("@") && !trimmed.includes("/"))) {
+      return `mailto:${trimmed}`;
+    }
+
+    // WhatsApp
+    if (lowerLabel.includes("whatsapp") || lowerLabel.includes("wa")) {
+      const cleanNum = trimmed.replace(/\D/g, "");
+      return `https://wa.me/${cleanNum}`;
+    }
+
+    // Phone / Tel
+    if (lowerLabel.includes("phone") || lowerLabel.includes("tel") || lowerLabel.includes("call")) {
+      return `tel:${trimmed.replace(/[^\d+]/g, "")}`;
+    }
+
+    // Default: Web URL
+    return `https://${trimmed.replace(/^\/\//, "")}`;
+  }
+
   static toContactChannelViewModel(
     channel: ContactProfile["channels"][number],
     index: number
@@ -197,6 +233,7 @@ export class PortfolioViewMapper {
       // Domain content
       label: channel.label,
       value: channel.value,
+      href: PortfolioViewMapper.buildContactHref(channel.label, channel.value),
       // Presentation config
       index: config?.index ?? String(index + 1).padStart(2, "0"),
       desktopWidth: config?.desktopWidth ?? "w-[580px]",

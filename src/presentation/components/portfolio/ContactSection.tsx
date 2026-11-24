@@ -37,22 +37,37 @@ export function ContactSection({
         </p>
 
         <div className="mt-[56px] space-y-[20px]">
-          {channels.map((channel) => (
-            <div
-              key={channel.index}
-              className={`flex min-h-[68px] ${channel.desktopWidth} max-w-full items-center border border-border-subtle bg-white/60 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-300 px-[24px] py-[12px] group`}
-            >
-              <span className="shrink-0 font-mono text-[10px] leading-[12px] font-semibold tracking-[0.02em] text-accent-cobalt group-hover:scale-110 transition-transform duration-200">
-                {channel.index}
-              </span>
-              <span className="ml-[20px] shrink-0 font-mono text-[11px] leading-[13px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
-                {channel.label}
-              </span>
-              <span className="ml-[24px] 2xl:ml-[32px] min-w-0 flex-1 font-sans text-[15px] leading-[20px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all sm:break-words">
-                {channel.value}
-              </span>
-            </div>
-          ))}
+          {channels.map((channel) => {
+            const isExternal =
+              channel.href.startsWith("http://") || channel.href.startsWith("https://");
+            return (
+              <a
+                key={channel.index}
+                href={channel.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className={`flex min-h-[68px] ${channel.desktopWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-300 px-[24px] py-[12px] group cursor-pointer`}
+              >
+                <div className="flex items-center min-w-0 flex-1">
+                  <span className="shrink-0 font-mono text-[10px] leading-[12px] font-semibold tracking-[0.02em] text-accent-cobalt group-hover:scale-110 transition-transform duration-200">
+                    {channel.index}
+                  </span>
+                  <span className="ml-[20px] shrink-0 font-mono text-[11px] leading-[13px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
+                    {channel.label}
+                  </span>
+                  <span className="ml-[24px] 2xl:ml-[32px] min-w-0 flex-1 font-sans text-[15px] leading-[20px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all sm:break-words">
+                    {channel.value}
+                  </span>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className="ml-[16px] shrink-0 font-mono text-[12px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1 transition-all duration-200"
+                >
+                  -&gt;
+                </span>
+              </a>
+            );
+          })}
         </div>
       </div>
 
@@ -66,22 +81,37 @@ export function ContactSection({
         </p>
 
         <div className="mt-[44px] space-y-[16px]">
-          {channels.map((channel) => (
-            <div
-              key={channel.index}
-              className={`flex min-h-[60px] ${channel.tabletWidth} max-w-full items-center border border-border-subtle px-[20px] py-[12px]`}
-            >
-              <span className="shrink-0 font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
-                {channel.index}
-              </span>
-              <span className="ml-[16px] shrink-0 font-mono text-[10px] leading-[12px] font-normal tracking-[0.02em] text-text-secondary">
-                {channel.label}
-              </span>
-              <span className="ml-[20px] min-w-0 flex-1 font-sans text-[14px] leading-[19px] font-normal text-text-primary break-all sm:break-words">
-                {channel.value}
-              </span>
-            </div>
-          ))}
+          {channels.map((channel) => {
+            const isExternal =
+              channel.href.startsWith("http://") || channel.href.startsWith("https://");
+            return (
+              <a
+                key={channel.index}
+                href={channel.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className={`flex min-h-[60px] ${channel.tabletWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-200 px-[20px] py-[12px] group cursor-pointer`}
+              >
+                <div className="flex items-center min-w-0 flex-1">
+                  <span className="shrink-0 font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                    {channel.index}
+                  </span>
+                  <span className="ml-[16px] shrink-0 font-mono text-[10px] leading-[12px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
+                    {channel.label}
+                  </span>
+                  <span className="ml-[20px] min-w-0 flex-1 font-sans text-[14px] leading-[19px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all sm:break-words">
+                    {channel.value}
+                  </span>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className="ml-[12px] shrink-0 font-mono text-[11px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1 transition-all duration-200"
+                >
+                  -&gt;
+                </span>
+              </a>
+            );
+          })}
         </div>
       </div>
 
@@ -95,24 +125,39 @@ export function ContactSection({
         </p>
 
         <div className="mt-[32px] space-y-[12px]">
-          {channels.map((channel) => (
-            <div
-              key={channel.index}
-              className={`flex ${channel.mobileHeight} flex-col justify-center border border-border-subtle px-[16px] py-[12px]`}
-            >
-              <div className="flex items-center">
-                <span className="shrink-0 font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
-                  {channel.index}
-                </span>
-                <span className="ml-[12px] font-mono text-[9px] leading-[11px] font-normal tracking-[0.02em] text-text-secondary">
-                  {channel.label}
-                </span>
-              </div>
-              <p className="mt-[8px] min-w-0 font-sans text-[12.5px] leading-[17px] font-normal text-text-primary break-all">
-                {channel.value}
-              </p>
-            </div>
-          ))}
+          {channels.map((channel) => {
+            const isExternal =
+              channel.href.startsWith("http://") || channel.href.startsWith("https://");
+            return (
+              <a
+                key={channel.index}
+                href={channel.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className={`flex ${channel.mobileHeight} flex-col justify-center border border-border-subtle bg-white/70 hover:bg-white active:bg-accent-cobalt/5 hover:border-accent-cobalt active:border-accent-cobalt transition-all px-[16px] py-[12px] group cursor-pointer`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <span className="shrink-0 font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                      {channel.index}
+                    </span>
+                    <span className="ml-[12px] font-mono text-[9px] leading-[11px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
+                      {channel.label}
+                    </span>
+                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-[11px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-0.5 transition-all duration-200"
+                  >
+                    -&gt;
+                  </span>
+                </div>
+                <p className="mt-[8px] min-w-0 font-sans text-[12.5px] leading-[17px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all">
+                  {channel.value}
+                </p>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>

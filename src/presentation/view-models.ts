@@ -52,6 +52,7 @@ export interface ExperienceViewModel {
 export interface ContactChannelViewModel {
   readonly label: string;
   readonly value: string;
+  readonly href: string;
   // Presentation config
   readonly index: string;
   readonly desktopWidth: string;
