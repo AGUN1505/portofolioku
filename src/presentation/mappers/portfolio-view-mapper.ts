@@ -119,6 +119,36 @@ export class PortfolioViewMapper {
     };
   }
 
+  static formatExperiencePeriod(
+    startDate?: Date | string | null,
+    endDate?: Date | string | null
+  ): string | undefined {
+    if (!startDate) return undefined;
+    const start = new Date(startDate);
+    if (isNaN(start.getTime())) return undefined;
+
+    const startStr = start.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+    });
+
+    if (!endDate) {
+      return `${startStr} — Present`;
+    }
+
+    const end = new Date(endDate);
+    if (isNaN(end.getTime())) {
+      return `${startStr} — Present`;
+    }
+
+    const endStr = end.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+    });
+
+    return `${startStr} — ${endStr}`;
+  }
+
   static toExperienceViewModel(experience: Experience): ExperienceViewModel {
     const config = EXPERIENCE_PRESENTATION_CONFIG.find((c) => c.id === experience.id);
 
@@ -128,6 +158,12 @@ export class PortfolioViewMapper {
       role: experience.role,
       institution: experience.institution,
       track: experience.track,
+      period: PortfolioViewMapper.formatExperiencePeriod(
+        experience.startDate,
+        experience.endDate
+      ),
+      startDate: experience.startDate,
+      endDate: experience.endDate,
       // Presentation config
       widthClass: config?.widthClass ?? "w-[220px]",
       ruleWidthClass: config?.ruleWidthClass ?? "w-[260px]",

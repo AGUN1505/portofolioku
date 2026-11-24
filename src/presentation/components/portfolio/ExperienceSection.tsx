@@ -46,6 +46,11 @@ export function ExperienceSection({
                 <p className="font-sans text-[14px] leading-[18px] font-normal text-text-secondary break-words">
                   {exp.institution}
                 </p>
+                {exp.period && (
+                  <p className="font-mono text-[11px] leading-[14px] text-text-secondary/80 mt-1">
+                    {exp.period}
+                  </p>
+                )}
               </div>
               <div className="flex min-w-0 items-center">
                 <div
@@ -70,9 +75,16 @@ export function ExperienceSection({
       <div className="hidden md:grid xl:hidden mx-auto w-full max-w-[1440px] grid-cols-2 gap-[32px] px-[40px] pt-[36px] pb-[48px]">
         {experiences.map((exp) => (
           <div key={exp.id} className="min-w-0 border-b border-border-subtle pb-[24px]">
-            <span className="font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
-              {exp.id}
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                {exp.id}
+              </span>
+              {exp.period && (
+                <span className="font-mono text-[10px] leading-[12px] text-text-secondary">
+                  {exp.period}
+                </span>
+              )}
+            </div>
             <h3 className="mt-[10px] font-sans text-[16px] leading-[19px] font-bold text-text-primary break-words">
               {exp.role}
             </h3>
@@ -101,9 +113,16 @@ export function ExperienceSection({
       <div className="md:hidden px-[16px] sm:px-[24px] pt-[28px] pb-[40px] space-y-[28px]">
         {experiences.map((exp) => (
           <div key={exp.id} className="border-b border-border-subtle pb-[28px] last:border-b-0 last:pb-0">
-            <span className="font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
-              {exp.id}
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                {exp.id}
+              </span>
+              {exp.period && (
+                <span className="font-mono text-[9.5px] leading-[12px] text-text-secondary">
+                  {exp.period}
+                </span>
+              )}
+            </div>
             <h3 className="mt-[10px] font-sans text-[15px] leading-[18px] font-bold text-text-primary break-words">
               {exp.role}
             </h3>

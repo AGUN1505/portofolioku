@@ -37,6 +37,9 @@ export interface ExperienceViewModel {
   readonly role: string;
   readonly institution: string;
   readonly track: string;
+  readonly period?: string;
+  readonly startDate?: Date | null;
+  readonly endDate?: Date | null;
   // Presentation config
   readonly widthClass: string;
   readonly ruleWidthClass: string;
