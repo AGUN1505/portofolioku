@@ -34,6 +34,7 @@ export interface ProjectViewModel {
 // Experience view model with presentation config
 export interface ExperienceViewModel {
   readonly id: string;
+  readonly displayIndex?: string;
   readonly role: string;
   readonly institution: string;
   readonly track: string;

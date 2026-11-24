@@ -149,12 +149,27 @@ export class PortfolioViewMapper {
     return `${startStr} — ${endStr}`;
   }
 
-  static toExperienceViewModel(experience: Experience): ExperienceViewModel {
-    const config = EXPERIENCE_PRESENTATION_CONFIG.find((c) => c.id === experience.id);
+  static toExperienceViewModel(
+    experience: Experience,
+    index?: number
+  ): ExperienceViewModel {
+    const displayIndex =
+      index !== undefined
+        ? String(index + 1).padStart(2, "0")
+        : typeof experience.order === "number" && experience.order > 0
+        ? String(experience.order).padStart(2, "0")
+        : experience.id.startsWith("exp_")
+        ? experience.id.replace("exp_", "")
+        : experience.id;
+
+    const config =
+      EXPERIENCE_PRESENTATION_CONFIG.find((c) => c.id === experience.id) ??
+      (index !== undefined ? EXPERIENCE_PRESENTATION_CONFIG[index] : undefined);
 
     return {
       // Domain content
       id: experience.id,
+      displayIndex,
       role: experience.role,
       institution: experience.institution,
       track: experience.track,

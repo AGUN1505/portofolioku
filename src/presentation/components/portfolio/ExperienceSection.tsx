@@ -27,14 +27,14 @@ export function ExperienceSection({
       {/* DESKTOP EXPERIENCE (1280px+: 4-Column Grid Ledger, centered max-w 1440px) */}
       <div className="hidden xl:block mx-auto w-full max-w-[1440px] xl:px-[48px] 2xl:px-[80px] pt-[48px] pb-[72px]">
         <div className="space-y-[20px]">
-          {experiences.map((exp) => (
+          {experiences.map((exp, idx) => (
             <div
               key={exp.id}
               className="grid xl:grid-cols-[64px_minmax(0,1.2fr)_minmax(180px,220px)_minmax(220px,1fr)] 2xl:grid-cols-[80px_1fr_240px_320px] items-center gap-[20px] 2xl:gap-[24px] border-b border-border-subtle pb-[20px] px-2 hover:bg-white hover:border-accent-cobalt/40 transition-all duration-200 group"
             >
               <div className="min-w-0">
                 <span className="font-mono text-[10px] leading-[12px] font-semibold tracking-[0.02em] text-accent-cobalt group-hover:scale-105 transition-transform duration-200">
-                  {exp.id}
+                  {exp.displayIndex ?? String(idx + 1).padStart(2, "0")}
                 </span>
               </div>
               <div className="min-w-0">
@@ -73,11 +73,11 @@ export function ExperienceSection({
 
       {/* TABLET EXPERIENCE (768px - 1279px: 2-Column Compact Grid) */}
       <div className="hidden md:grid xl:hidden mx-auto w-full max-w-[1440px] grid-cols-2 gap-[32px] px-[40px] pt-[36px] pb-[48px]">
-        {experiences.map((exp) => (
+        {experiences.map((exp, idx) => (
           <div key={exp.id} className="min-w-0 border-b border-border-subtle pb-[24px]">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
-                {exp.id}
+                {exp.displayIndex ?? String(idx + 1).padStart(2, "0")}
               </span>
               {exp.period && (
                 <span className="font-mono text-[10px] leading-[12px] text-text-secondary">
@@ -111,11 +111,11 @@ export function ExperienceSection({
 
       {/* MOBILE EXPERIENCE (< 768px: Single Column Stacked) */}
       <div className="md:hidden px-[16px] sm:px-[24px] pt-[28px] pb-[40px] space-y-[28px]">
-        {experiences.map((exp) => (
+        {experiences.map((exp, idx) => (
           <div key={exp.id} className="border-b border-border-subtle pb-[28px] last:border-b-0 last:pb-0">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
-                {exp.id}
+                {exp.displayIndex ?? String(idx + 1).padStart(2, "0")}
               </span>
               {exp.period && (
                 <span className="font-mono text-[9.5px] leading-[12px] text-text-secondary">

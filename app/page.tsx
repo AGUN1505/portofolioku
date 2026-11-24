@@ -33,7 +33,9 @@ async function PortfolioContent() {
     portfolio.hero.engineeringNodes
   );
   const projects = portfolio.projects.map(PortfolioViewMapper.toProjectViewModel);
-  const experiences = portfolio.experiences.map(PortfolioViewMapper.toExperienceViewModel);
+  const experiences = portfolio.experiences.map((exp, idx) =>
+    PortfolioViewMapper.toExperienceViewModel(exp, idx)
+  );
   const contactChannels = PortfolioViewMapper.toContactChannelViewModels(
     portfolio.contact.channels
   );
