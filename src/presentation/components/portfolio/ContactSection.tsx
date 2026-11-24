@@ -46,22 +46,21 @@ export function ContactSection({
                 href={channel.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className={`flex min-h-[68px] ${channel.desktopWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-300 px-[24px] py-[12px] group cursor-pointer`}
+                title={channel.value}
+                aria-label={`${channel.label}: ${channel.value}`}
+                className={`flex min-h-[64px] ${channel.desktopWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-300 px-[24px] py-[14px] group cursor-pointer`}
               >
                 <div className="flex items-center min-w-0 flex-1">
-                  <span className="shrink-0 font-mono text-[10px] leading-[12px] font-semibold tracking-[0.02em] text-accent-cobalt group-hover:scale-110 transition-transform duration-200">
+                  <span className="shrink-0 font-mono text-[11px] leading-[13px] font-semibold tracking-[0.02em] text-accent-cobalt group-hover:scale-110 transition-transform duration-200">
                     {channel.index}
                   </span>
-                  <span className="ml-[20px] shrink-0 font-mono text-[11px] leading-[13px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
+                  <span className="ml-[20px] shrink-0 font-mono text-[13px] 2xl:text-[14px] leading-[18px] font-medium tracking-[0.04em] text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 uppercase">
                     {channel.label}
-                  </span>
-                  <span className="ml-[24px] 2xl:ml-[32px] min-w-0 flex-1 font-sans text-[15px] leading-[20px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all sm:break-words">
-                    {channel.value}
                   </span>
                 </div>
                 <span
                   aria-hidden="true"
-                  className="ml-[16px] shrink-0 font-mono text-[12px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1 transition-all duration-200"
+                  className="ml-[16px] shrink-0 font-mono text-[13px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1.5 transition-all duration-200"
                 >
                   -&gt;
                 </span>
@@ -90,22 +89,21 @@ export function ContactSection({
                 href={channel.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className={`flex min-h-[60px] ${channel.tabletWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-200 px-[20px] py-[12px] group cursor-pointer`}
+                title={channel.value}
+                aria-label={`${channel.label}: ${channel.value}`}
+                className={`flex min-h-[58px] ${channel.tabletWidth} max-w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white hover:border-accent-cobalt hover-card-swiss transition-all duration-200 px-[20px] py-[12px] group cursor-pointer`}
               >
                 <div className="flex items-center min-w-0 flex-1">
-                  <span className="shrink-0 font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                  <span className="shrink-0 font-mono text-[10px] leading-[12px] font-semibold tracking-[0.02em] text-accent-cobalt">
                     {channel.index}
                   </span>
-                  <span className="ml-[16px] shrink-0 font-mono text-[10px] leading-[12px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
+                  <span className="ml-[16px] shrink-0 font-mono text-[12px] leading-[16px] font-medium tracking-[0.04em] text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 uppercase">
                     {channel.label}
-                  </span>
-                  <span className="ml-[20px] min-w-0 flex-1 font-sans text-[14px] leading-[19px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all sm:break-words">
-                    {channel.value}
                   </span>
                 </div>
                 <span
                   aria-hidden="true"
-                  className="ml-[12px] shrink-0 font-mono text-[11px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1 transition-all duration-200"
+                  className="ml-[12px] shrink-0 font-mono text-[12px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-1 transition-all duration-200"
                 >
                   -&gt;
                 </span>
@@ -134,27 +132,24 @@ export function ContactSection({
                 href={channel.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className={`flex ${channel.mobileHeight} flex-col justify-center border border-border-subtle bg-white/70 hover:bg-white active:bg-accent-cobalt/5 hover:border-accent-cobalt active:border-accent-cobalt transition-all px-[16px] py-[12px] group cursor-pointer`}
+                title={channel.value}
+                aria-label={`${channel.label}: ${channel.value}`}
+                className="flex min-h-[52px] sm:min-h-[56px] w-full items-center justify-between border border-border-subtle bg-white/70 hover:bg-white active:bg-accent-cobalt/5 hover:border-accent-cobalt active:border-accent-cobalt transition-all px-[16px] py-[12px] group cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="shrink-0 font-mono text-[8.5px] leading-[10px] font-semibold tracking-[0.02em] text-accent-cobalt">
-                      {channel.index}
-                    </span>
-                    <span className="ml-[12px] font-mono text-[9px] leading-[11px] font-normal tracking-[0.02em] text-text-secondary group-hover:text-accent-cobalt transition-colors duration-200">
-                      {channel.label}
-                    </span>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    className="font-mono text-[11px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-0.5 transition-all duration-200"
-                  >
-                    -&gt;
+                <div className="flex items-center min-w-0 flex-1">
+                  <span className="shrink-0 font-mono text-[9px] leading-[11px] font-semibold tracking-[0.02em] text-accent-cobalt">
+                    {channel.index}
+                  </span>
+                  <span className="ml-[14px] shrink-0 font-mono text-[11.5px] leading-[15px] font-medium tracking-[0.04em] text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 uppercase">
+                    {channel.label}
                   </span>
                 </div>
-                <p className="mt-[8px] min-w-0 font-sans text-[12.5px] leading-[17px] font-normal text-text-primary group-hover:text-accent-cobalt transition-colors duration-200 break-all">
-                  {channel.value}
-                </p>
+                <span
+                  aria-hidden="true"
+                  className="ml-[12px] shrink-0 font-mono text-[11px] text-text-secondary group-hover:text-accent-cobalt group-hover:translate-x-0.5 transition-all duration-200"
+                >
+                  -&gt;
+                </span>
               </a>
             );
           })}
