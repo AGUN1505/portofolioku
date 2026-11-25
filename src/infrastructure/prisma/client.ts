@@ -11,20 +11,10 @@ if (typeof process !== 'undefined' && process.env) {
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   pgPool: pg.Pool | undefined;
+  pgPoolUrl: string | undefined;
 };
 
 export function getPrismaClient(): PrismaClient {
-  if (globalForPrisma.prisma) {
-    if (
-      !('certificate' in globalForPrisma.prisma) ||
-      !('sectionConfig' in globalForPrisma.prisma)
-    ) {
-      globalForPrisma.prisma = undefined;
-    } else {
-      return globalForPrisma.prisma;
-    }
-  }
-
   const rawConnectionString = process.env.DATABASE_URL;
   if (!rawConnectionString) {
     throw new Error('[PrismaClient] DATABASE_URL is not set in environment.');
@@ -42,11 +32,31 @@ export function getPrismaClient(): PrismaClient {
     connectionString += (connectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify';
   }
 
+  if (globalForPrisma.pgPoolUrl !== connectionString) {
+    void globalForPrisma.pgPool?.end().catch(() => {});
+    globalForPrisma.prisma = undefined;
+    globalForPrisma.pgPool = undefined;
+    globalForPrisma.pgPoolUrl = undefined;
+  }
+
+  if (globalForPrisma.prisma) {
+    if (
+      !('certificate' in globalForPrisma.prisma) ||
+      !('sectionConfig' in globalForPrisma.prisma)
+    ) {
+      globalForPrisma.prisma = undefined;
+    } else {
+      return globalForPrisma.prisma;
+    }
+  }
+
   const pool =
     globalForPrisma.pgPool ??
     new pg.Pool({
       connectionString,
       ssl: { rejectUnauthorized: false },
+      keepAlive: true,
+      connectionTimeoutMillis: 10000,
     });
 
   const adapter = new PrismaPg(pool);
@@ -58,6 +68,7 @@ export function getPrismaClient(): PrismaClient {
   if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = client;
     globalForPrisma.pgPool = pool;
+    globalForPrisma.pgPoolUrl = connectionString;
   }
 
   return client;
