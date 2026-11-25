@@ -228,21 +228,12 @@ export function Navbar({ links, brandName }: NavbarProps) {
                 <a
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="group inline-flex items-baseline gap-[9px] whitespace-nowrap py-1 relative cursor-pointer"
+                  className="group inline-flex items-baseline whitespace-nowrap py-1 relative cursor-pointer"
                 >
-                  <span
-                    className={`font-mono text-[11px] leading-[13px] transition-colors duration-200 ${
-                      isActive
-                        ? "font-semibold text-accent-cobalt"
-                        : "font-normal text-text-secondary group-hover:text-accent-cobalt"
-                    }`}
-                  >
-                    {item.index}
-                  </span>
                   <span
                     className={`font-sans text-[14px] leading-[17px] transition-colors duration-200 ${
                       isActive
-                        ? "font-semibold text-text-primary"
+                        ? "font-semibold text-accent-cobalt"
                         : "font-normal text-text-primary group-hover:text-accent-cobalt"
                     }`}
                   >
@@ -278,15 +269,6 @@ export function Navbar({ links, brandName }: NavbarProps) {
                       : "font-semibold text-text-primary hover:text-accent-cobalt"
                   }`}
                 >
-                  <span
-                    className={`font-mono text-[11px] mr-1 transition-colors ${
-                      isActive
-                        ? "text-accent-cobalt font-bold"
-                        : "text-text-secondary group-hover:text-accent-cobalt"
-                    }`}
-                  >
-                    {item.index}
-                  </span>
                   {item.label}
                   {/* Active / Hover Indicator */}
                   <span
@@ -354,25 +336,14 @@ export function Navbar({ links, brandName }: NavbarProps) {
                         : "hover:pl-1"
                     }`}
                   >
-                    <span className="flex items-center gap-[12px]">
-                      <span
-                        className={`font-mono text-[11px] leading-[13px] transition-colors ${
-                          isActive
-                            ? "font-semibold text-accent-cobalt"
-                            : "font-normal text-text-secondary group-hover:text-accent-cobalt"
-                        }`}
-                      >
-                        {item.index}
-                      </span>
-                      <span
-                        className={`font-sans text-[14px] leading-[17px] transition-colors ${
-                          isActive
-                            ? "font-bold text-accent-cobalt"
-                            : "font-normal text-text-primary group-hover:text-accent-cobalt"
-                        }`}
-                      >
-                        {item.label}
-                      </span>
+                    <span
+                      className={`font-sans text-[14px] leading-[17px] transition-colors ${
+                        isActive
+                          ? "font-bold text-accent-cobalt"
+                          : "font-normal text-text-primary group-hover:text-accent-cobalt"
+                      }`}
+                    >
+                      {item.label}
                     </span>
                     <span
                       className={`font-mono text-[11px] transition-all ${
