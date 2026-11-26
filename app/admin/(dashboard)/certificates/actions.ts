@@ -117,6 +117,7 @@ export async function createCertificateAction(
     revalidatePath('/admin/certificates');
     revalidatePath('/admin');
     revalidatePath('/');
+    revalidatePath('/certificates');
 
     return {
       success: true,
@@ -243,6 +244,7 @@ export async function updateCertificateAction(
     revalidatePath('/admin/certificates');
     revalidatePath('/admin');
     revalidatePath('/');
+    revalidatePath('/certificates');
 
     return {
       success: true,
@@ -318,6 +320,7 @@ export async function deleteCertificateAction(id: string): Promise<ActionResult>
     revalidatePath('/admin/certificates');
     revalidatePath('/admin');
     revalidatePath('/');
+    revalidatePath('/certificates');
 
     return {
       success: true,
@@ -380,6 +383,7 @@ export async function reorderCertificatesAction(orderedIds: string[]): Promise<A
     revalidatePath('/admin/certificates');
     revalidatePath('/admin');
     revalidatePath('/');
+    revalidatePath('/certificates');
 
     return {
       success: true,
