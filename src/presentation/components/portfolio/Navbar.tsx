@@ -13,16 +13,13 @@ export function Navbar({ links, brandName }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Dynamic active section tracking for scrollspy and click interactions
-  const [activeHref, setActiveHref] = useState<string>(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      return window.location.hash;
-    }
-    return links.find((l) => l.active)?.href ?? "";
-  });
+  // Dynamic active section tracking for scrollspy and click interactions.
+  // Initialize deterministically on both server and client to avoid hydration mismatches.
+  const [activeHref, setActiveHref] = useState<string>("");
 
   const isClickScrollingRef = useRef(false);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitializedHashRef = useRef(false);
 
   /**
    * Smoothly navigates to target section with sticky header offset
@@ -161,9 +158,20 @@ export function Navbar({ links, brandName }: NavbarProps) {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+
+    const frameId = window.requestAnimationFrame(() => {
+      handleScroll();
+      if (!hasInitializedHashRef.current) {
+        hasInitializedHashRef.current = true;
+        const initialHash = window.location.hash;
+        if (initialHash && links.some((l) => l.href === initialHash)) {
+          setActiveHref(initialHash);
+        }
+      }
+    });
 
     return () => {
+      window.cancelAnimationFrame(frameId);
       window.removeEventListener("scroll", handleScroll);
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
